@@ -1,0 +1,81 @@
+// New Jog controller
+// Was part of the big dandy handy handler 
+
+
+// New: Jog input handler (for rotation CC)
+DDJFLX10.jogInputHandler = function(input) {  // input = [status, control, value]
+    let status = input[0];
+    let channelNum = status - 0xB0 + 1;  // CC Bn for ch1-4 (B0-B3)
+    let group = '[Channel' + channelNum + ']';
+    let delta = input[2] - 64;  // Relative value
+
+    switch (input[1]) {  // Control hex
+        case 0x22:  // Platter, vinyl on
+            if (engine.isScratching(channelNum)) {
+                engine.scratchTick(channelNum, delta);
+            } else {
+                engine.setValue(group, 'jog', delta * DDJFLX10.bendScale);
+            }
+            break;
+        case 0x23:  // Platter, vinyl off
+            engine.setValue(group, 'jog', delta * DDJFLX10.bendScale);
+            break;
+        case 0x21:  // Wheel side rotate
+            engine.setValue(group, 'jog', delta * DDJFLX10.fastSeekScale);
+            break;
+        case 0x29:  // Plus 4 beatjump
+            engine.setValue(group, 'beatjump', delta > 0 ? 4 : -4);  // Forward/back
+            break;
+        case 0x1F:  // Other jog mode (adjust if needed)
+            // e.g., engine.setValue(group, 'jog', delta);
+            break;
+    }
+};
+
+// New: Jog ring LED callback (white on play)
+DDJFLX10.updateJogRing = function(value, group, key) {
+    let channelNum = script.deckFromGroup(group);
+    let ringControl = 0x09 + (channelNum - 1);  // 0x09 d1, 0x0A d2, etc.
+    midi.sendShortMsg(0xBF, ringControl, value ? 0x01 : 0x00);  // White=0x01, off=0x00
+};
+
+// New: Jog display info callback (show on track load)
+DDJFLX10.updateJogDisplay = function(value, group, key) {
+    if (value) {  // On load
+        let channelNum = script.deckFromGroup(group);
+        midi.sendShortMsg(0x9F, 0x5D + (channelNum - 1), 0x00);  // Display=0x00 (hide=0x7F if needed)
+    }
+};
+
+// Init: Existing + register jog inputs and connect outputs
+DDJFLX10.init = function(id, debugging) {
+    // Existing (softTakeover, pad registrations, etc.)
+
+    // Register jog rotation inputs (CC on B0-B3, specific controls)
+    for (let ch = 0; ch < 4; ch++) {
+        let jogControls = [0x21, 0x22, 0x23, 0x29, 0x1F];  // From spec
+        for (let ctrl of jogControls) {
+            midi.makeInputHandler([0xB0 + ch, ctrl], DDJFLX10.jogInputHandler);
+        }
+
+        let group = '[Channel' + (ch + 1) + ']';
+        // Existing pad connects...
+
+        // Connect jog outputs
+        engine.makeConnection(group, 'play', 'DDJFLX10.updateJogRing');
+        engine.makeConnection(group, 'track_loaded', 'DDJFLX10.updateJogDisplay');
+    }
+
+    // Existing initial LED reset...
+};
+
+// Shutdown: Existing + turn off jog rings/displays
+DDJFLX10.shutdown = function() {
+    // Existing pad off...
+
+    // Jog rings/displays off
+    for (let ch = 1; ch <= 4; ch++) {
+        midi.sendShortMsg(0xBF, 0x09 + (ch - 1), 0x00);  // Ring off
+        midi.sendShortMsg(0x9F, 0x5D + (ch - 1), 0x7F);  // Hide display
+    }
+};

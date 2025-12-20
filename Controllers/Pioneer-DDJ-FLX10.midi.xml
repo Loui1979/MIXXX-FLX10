@@ -1,0 +1,1560 @@
+<?xml version='1.0' encoding='utf-8'?>
+<MixxxControllerPreset mixxxVersion="2.6.0+" schemaVersion="1">
+    <info>
+        <name>Pioneer DDJ-FLX10</name>
+        <author>Lougazi(AKA Sweet Lou)</author>
+        <description>All controls xml functional except jog wheels, pads, displays, etc... that need script. They were to be in the script only as to keep down xml size ideally
+        I tried to keep as many of the controls on the xml as possible to utilize builtin Mixxx control system</description>
+        <forums>Mentioned in Reddit and Mixxx forum, experimental. </forums>
+        <wiki>No wiki yet</wiki>
+    </info>
+    <controller id="DDJ-FLX10">
+        <scriptfiles>
+            <file filename="midi-components-0.0.js" functionprefix=""/>
+            <file filename="common-controller-scripts.js" functionprefix=""/>
+            <file filename="Pioneer-DDJ-FLX10-script.js" functionprefix="DDJFLX10"/>
+        </scriptfiles>
+        <controls>
+            <control>
+                <group>[Channel1]</group>
+                <key>rate</key>
+                <description>TEMPO (DECK1) - fader - Tempo control MSB</description>
+                <status>0xB0</status>
+                <midino>0x00</midino>
+                <options>
+                    <invert/>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>rate</key>
+                <description>TEMPO (DECK2) - fader - Tempo control MSB</description>
+                <status>0xB1</status>
+                <midino>0x00</midino>
+                <options>
+                    <invert/>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>rate</key>
+                <description>TEMPO (DECK3) - fader - Tempo control MSB</description>
+                <status>0xB2</status>
+                <midino>0x00</midino>
+                <options>
+                    <invert/>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>rate</key>
+                <description>TEMPO (DECK4) - fader - Tempo control MSB</description>
+                <status>0xB3</status>
+                <midino>0x00</midino>
+                <options>
+                    <invert/>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>pregain</key>
+                <description>CHAN 1 TRIM MSB</description>
+                <status>0xB0</status>
+                <midino>0x04</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>pregain</key>
+                <description>TRIM MSB</description>
+                <status>0xB1</status>
+                <midino>0x04</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>pregain</key>
+                <description>TRIM MSB</description>
+                <status>0xB2</status>
+                <midino>0x04</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>pregain</key>
+                <description>TRIM MSB</description>
+                <status>0xB3</status>
+                <midino>0x04</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel1]_Effect1]</group>
+                <key>parameter3</key>
+                <description>CHAN 1 HI EQ MSB</description>
+                <status>0xB0</status>
+                <midino>0x07</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel2]_Effect1]</group>
+                <key>parameter3</key>
+                <description>CHAN 2 HI EQ MSB</description>
+                <status>0xB1</status>
+                <midino>0x07</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel3]_Effect1]</group>
+                <key>parameter3</key>
+                <description>CHAN 3 HI EQ MSB</description>
+                <status>0xB2</status>
+                <midino>0x07</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel4]_Effect1]</group>
+                <key>parameter3</key>
+                <description>CHAN 4 HI EQ MSB</description>
+                <status>0xB3</status>
+                <midino>0x07</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>play</key>
+                <description>PLAY/PAUSE</description>
+                <status>0x90</status>
+                <midino>0x0B</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>play</key>
+                <description>PLAY/PAUSE</description>
+                <status>0x91</status>
+                <midino>0x0B</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>play</key>
+                <description>PLAY/PAUSE DECK3</description>
+                <status>0x92</status>
+                <midino>0x0B</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>play</key>
+                <description>PLAY/PAUSE DECK4</description>
+                <status>0x93</status>
+                <midino>0x0B</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel1]_Effect1]</group>
+                <key>parameter2</key>
+                <description>CHAN 1 MID EQ MSB</description>
+                <status>0xB0</status>
+                <midino>0x0B</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel2]_Effect1]</group>
+                <key>parameter2</key>
+                <description>CHAN 2 MID EQ MSB</description>
+                <status>0xB1</status>
+                <midino>0x0B</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel3]_Effect1]</group>
+                <key>parameter2</key>
+                <description>CHAN 3 MID EQ MSB</description>
+                <status>0xB2</status>
+                <midino>0x0B</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel4]_Effect1]</group>
+                <key>parameter2</key>
+                <description>CHAN 4 MID EQ MSB</description>
+                <status>0xB3</status>
+                <midino>0x0B</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>cue_default</key>
+                <description>CUE</description>
+                <status>0x90</status>
+                <midino>0x0C</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>cue_default</key>
+                <description>CUE</description>
+                <status>0x91</status>
+                <midino>0x0C</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>cue_default</key>
+                <description>CUE DECK3</description>
+                <status>0x92</status>
+                <midino>0x0C</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>cue_default</key>
+                <description>CUE DECK4</description>
+                <status>0x93</status>
+                <midino>0x0C</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel1]_Effect1]</group>
+                <key>parameter1</key>
+                <description>CHAN 1 LOW EQ MSB</description>
+                <status>0xB0</status>
+                <midino>0x0F</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel2]_Effect1]</group>
+                <key>parameter1</key>
+                <description>CHAN 2 LOW EQ MSB</description>
+                <status>0xB1</status>
+                <midino>0x0F</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel3]_Effect1]</group>
+                <key>parameter1</key>
+                <description>CHAN 3 LOW EQ MSB</description>
+                <status>0xB2</status>
+                <midino>0x0F</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel4]_Effect1]</group>
+                <key>parameter1</key>
+                <description>CHAN 4 LOW EQ MSB</description>
+                <status>0xB3</status>
+                <midino>0x0F</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>volume</key>
+                <description>CHAN 1 CHANNEL FADER 1 MSB</description>
+                <status>0xB0</status>
+                <midino>0x13</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>volume</key>
+                <description>CHANNEL FADER 2 MSB</description>
+                <status>0xB1</status>
+                <midino>0x13</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>volume</key>
+                <description>CHANNEL FADER 3 MSB</description>
+                <status>0xB2</status>
+                <midino>0x13</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>volume</key>
+                <description>CHANNEL FADER 4 MSB</description>
+                <status>0xB3</status>
+                <midino>0x13</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel1]]</group>
+                <key>super1</key>
+                <description>CHANNEL  1  COLOR FX/Filter knob   MSB</description>
+                <status>0xB0</status>
+                <midino>0x17</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel2]]</group>
+                <key>super1</key>
+                <description>CHANNEL 2 COLOR FX/Filter knob MSB</description>
+                <status>0xB1</status>
+                <midino>0x17</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel3]]</group>
+                <key>super1</key>
+                <description>CHANNEL 3 COLOR FX/Filter knob MSB</description>
+                <status>0xB2</status>
+                <midino>0x17</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel4]]</group>
+                <key>super1</key>
+                <description>COLOR FX/Filter knob   MSB</description>
+                <status>0xB3</status>
+                <midino>0x1A</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER +SHIFT (DECK1) - rotate</description>
+                <status>0xB0</status>
+                <midino>0x1F</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER +SHIFT (DECK2) - rotate</description>
+                <status>0xB1</status>
+                <midino>0x1F</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER +SHIFT (DECK3) - rotate</description>
+                <status>0xB2</status>
+                <midino>0x1F</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER +SHIFT (DECK4) - rotate</description>
+                <status>0xB3</status>
+                <midino>0x1F</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Master]</group>
+                <key>crossfader</key>
+                <description>CROSSFADER - slider</description>
+                <status>0xB6</status>
+                <midino>0x1F</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>rate</key>
+                <description>TEMPO (DECK1) - fader - Tempo control LSB</description>
+                <status>0xB0</status>
+                <midino>0x20</midino>
+                <options>
+                    <invert/>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>rate</key>
+                <description>TEMPO (DECK2) - fader - Tempo control LSB</description>
+                <status>0xB1</status>
+                <midino>0x20</midino>
+                <options>
+                    <invert/>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>rate</key>
+                <description>TEMPO (DECK3) - fader - Tempo control LSB</description>
+                <status>0xB2</status>
+                <midino>0x20</midino>
+                <options>
+                    <invert/>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>rate</key>
+                <description>TEMPO (DECK4) - fader - Tempo control LSB</description>
+                <status>0xB3</status>
+                <midino>0x20</midino>
+                <options>
+                    <invert/>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG WHEEL SIDE (DECK1) - rotate</description>
+                <status>0xB0</status>
+                <midino>0x21</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG WHEEL SIDE (DECK2) - rotate</description>
+                <status>0xB1</status>
+                <midino>0x21</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG WHEEL SIDE (DECK3) - rotate</description>
+                <status>0xB2</status>
+                <midino>0x21</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG WHEEL SIDE (DECK4) - rotate</description>
+                <status>0xB3</status>
+                <midino>0x21</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER Vinyl On (DECK1) - rotate</description>
+                <status>0xB0</status>
+                <midino>0x22</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER Vinyl On (DECK2) - rotate</description>
+                <status>0xB1</status>
+                <midino>0x22</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER Vinyl On (DECK3) - rotate</description>
+                <status>0xB2</status>
+                <midino>0x22</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER Vinyl On (DECK4) - rotate</description>
+                <status>0xB3</status>
+                <midino>0x22</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER Vinyl Off (DECK1) - rotate</description>
+                <status>0xB0</status>
+                <midino>0x23</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER Vinyl Off (DECK2) - rotate</description>
+                <status>0xB1</status>
+                <midino>0x23</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER Vinyl Off (DECK3) - rotate</description>
+                <status>0xB2</status>
+                <midino>0x23</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG PLATTER Vinyl Off (DECK4) - rotate</description>
+                <status>0xB3</status>
+                <midino>0x23</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>pregain</key>
+                <description>CHAN 1 TRIM LSB</description>
+                <status>0xB0</status>
+                <midino>0x24</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>pregain</key>
+                <description>TRIM LSB</description>
+                <status>0xB1</status>
+                <midino>0x24</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>pregain</key>
+                <description>CHAN 3 TRIM LSB</description>
+                <status>0xB2</status>
+                <midino>0x24</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>pregain</key>
+                <description>TRIM LSB</description>
+                <status>0xB3</status>
+                <midino>0x24</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG WHEEL SIDE +SHIFT (DECK1) - rotate</description>
+                <status>0xB0</status>
+                <midino>0x26</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG WHEEL SIDE +SHIFT (DECK2) - rotate</description>
+                <status>0xB1</status>
+                <midino>0x26</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG WHEEL SIDE +SHIFT (DECK3) - rotate</description>
+                <status>0xB2</status>
+                <midino>0x26</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG WHEEL SIDE +SHIFT (DECK4) - rotate</description>
+                <status>0xB3</status>
+                <midino>0x26</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel1]_Effect1]</group>
+                <key>parameter3</key>
+                <description>CHAN 1 HI EQ LSB</description>
+                <status>0xB0</status>
+                <midino>0x27</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel2]_Effect1]</group>
+                <key>parameter3</key>
+                <description>CHAN 2 HI EQ LSB</description>
+                <status>0xB1</status>
+                <midino>0x27</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel3]_Effect1]</group>
+                <key>parameter3</key>
+                <description>CHAN 3 HI EQ LSB</description>
+                <status>0xB2</status>
+                <midino>0x27</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel4]_Effect1]</group>
+                <key>parameter3</key>
+                <description>CHAN 4 HI EQ LSB</description>
+                <status>0xB3</status>
+                <midino>0x27</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG +4 BEATJUMP (DECK1) - rotate</description>
+                <status>0xB0</status>
+                <midino>0x29</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG +4 BEATJUMP (DECK2) - rotate</description>
+                <status>0xB1</status>
+                <midino>0x29</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG +4 BEATJUMP (DECK3) - rotate</description>
+                <status>0xB2</status>
+                <midino>0x29</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.jogInputHandler</key>
+                <description>JOG +4 BEATJUMP (DECK4) - rotate</description>
+                <status>0xB3</status>
+                <midino>0x29</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel1]_Effect1]</group>
+                <key>parameter2</key>
+                <description>CHAN 1 MID EQ LSB</description>
+                <status>0xB0</status>
+                <midino>0x2B</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel2]_Effect1]</group>
+                <key>parameter2</key>
+                <description>CHAN 2 MID EQ LSB</description>
+                <status>0xB1</status>
+                <midino>0x2B</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel3]_Effect1]</group>
+                <key>parameter2</key>
+                <description>CHAN 3 MID EQ LSB</description>
+                <status>0xB2</status>
+                <midino>0x2B</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel4]_Effect1]</group>
+                <key>parameter2</key>
+                <description>CHAN 4 MID EQ LSB</description>
+                <status>0xB3</status>
+                <midino>0x2B</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel1]_Effect1]</group>
+                <key>parameter1</key>
+                <description>CHAN 1 LOW EQ LSB</description>
+                <status>0xB0</status>
+                <midino>0x2F</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel2]_Effect1]</group>
+                <key>parameter1</key>
+                <description>CHAN 2 LOW EQ LSB</description>
+                <status>0xB1</status>
+                <midino>0x2F</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel3]_Effect1]</group>
+                <key>parameter1</key>
+                <description>CHAN 3 LOW EQ LSB</description>
+                <status>0xB2</status>
+                <midino>0x2F</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[EqualizerRack1_[Channel4]_Effect1]</group>
+                <key>parameter1</key>
+                <description>CHAN 4 LOW EQ LSB</description>
+                <status>0xB3</status>
+                <midino>0x2F</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>volume</key>
+                <description>CHAN 1 CHANNEL FADER 1 LSB</description>
+                <status>0xB0</status>
+                <midino>0x33</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>volume</key>
+                <description>CHANNEL FADER 2 LSB</description>
+                <status>0xB1</status>
+                <midino>0x33</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>volume</key>
+                <description>CHANNEL FADER 3 LSB</description>
+                <status>0xB2</status>
+                <midino>0x33</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>volume</key>
+                <description>CHANNEL FADER 4 LSB</description>
+                <status>0xB3</status>
+                <midino>0x33</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.jogTouchHandler</key>
+                <description>JOG PLATTER TOUCH (DECK1)</description>
+                <status>0x90</status>
+                <midino>0x36</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.jogTouchHandler</key>
+                <description>JOG PLATTER TOUCH (DECK2)</description>
+                <status>0x91</status>
+                <midino>0x36</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.jogTouchHandler</key>
+                <description>JOG PLATTER TOUCH (DECK3)</description>
+                <status>0x92</status>
+                <midino>0x36</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.jogTouchHandler</key>
+                <description>JOG PLATTER TOUCH (DECK4)</description>
+                <status>0x93</status>
+                <midino>0x36</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel1]]</group>
+                <key>super1</key>
+                <description>CHANNEL  1  COLOR FX/Filter knob  LSB</description>
+                <status>0xB0</status>
+                <midino>0x37</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel2]]</group>
+                <key>super1</key>
+                <description>CHANNEL 2 COLOR FX/Filter knob LSB</description>
+                <status>0xB1</status>
+                <midino>0x37</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel3]]</group>
+                <key>super1</key>
+                <description>CHANNEL 3 COLOR FX/Filter knob LSB</description>
+                <status>0xB2</status>
+                <midino>0x37</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel4]]</group>
+                <key>super1</key>
+                <description>COLOR FX/Filter knob  LSB</description>
+                <status>0xB3</status>
+                <midino>0x3A</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Master]</group>
+                <key>crossfader</key>
+                <description>CROSSFADER - slider</description>
+                <status>0xB6</status>
+                <midino>0x3F</midino>
+                <options>
+                    <fourteen-bit-lsb/>
+                </options>
+            </control>
+            <control>
+                <group>[Library]</group>
+                <key>MoveVertical</key>
+                <description>BROWSE - rotate</description>
+                <status>0xB6</status>
+                <midino>0x40</midino>
+                <options>
+                    <selectknob/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>LoadSelectedTrack</key>
+                <description>LOAD TRACK CH1</description>
+                <status>0x96</status>
+                <midino>0x46</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>LoadSelectedTrack</key>
+                <description>LOAD TRACK CH2</description>
+                <status>0x96</status>
+                <midino>0x47</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>start_play</key>
+                <description>CUE +SHIFT (DECK1) - press - Jump to track start</description>
+                <status>0x90</status>
+                <midino>0x48</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>start_play</key>
+                <description>CUE +SHIFT (DECK2) - press - Jump to track start</description>
+                <status>0x91</status>
+                <midino>0x48</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>start_play</key>
+                <description>CUE +SHIFT (DECK3) - press - Jump to track start</description>
+                <status>0x92</status>
+                <midino>0x48</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>start_play</key>
+                <description>CUE +SHIFT (DECK4) - press - Jump to track start</description>
+                <status>0x93</status>
+                <midino>0x48</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>LoadSelectedTrack</key>
+                <description>LOAD TRACK CH3</description>
+                <status>0x96</status>
+                <midino>0x48</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>LoadSelectedTrack</key>
+                <description>LOAD TRACK CH4</description>
+                <status>0x96</status>
+                <midino>0x49</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>pfl</key>
+                <description>CUE Toggle (Headphones)</description>
+                <status>0x90</status>
+                <midino>0x54</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>pfl</key>
+                <description>CUE Toggle (Headphones)</description>
+                <status>0x91</status>
+                <midino>0x54</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>pfl</key>
+                <description>CUE Toggle (Headphones)</description>
+                <status>0x92</status>
+                <midino>0x54</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>pfl</key>
+                <description>CUE Toggle (Headphones)</description>
+                <status>0x93</status>
+                <midino>0x54</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>sync_key</key>
+                <description>KEY SYNC</description>
+                <status>0x90</status>
+                <midino>0x58</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>sync_enabled</key>
+                <description>SYNC</description>
+                <status>0x90</status>
+                <midino>0x58</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>sync_key</key>
+                <description>KEY SYNC</description>
+                <status>0x91</status>
+                <midino>0x58</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>sync_enabled</key>
+                <description>SYNC</description>
+                <status>0x91</status>
+                <midino>0x58</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>sync_key</key>
+                <description>KEY SYNC</description>
+                <status>0x92</status>
+                <midino>0x58</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>sync_enabled</key>
+                <description>SYNC DECK3</description>
+                <status>0x92</status>
+                <midino>0x58</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>sync_key</key>
+                <description>KEY SYNC</description>
+                <status>0x93</status>
+                <midino>0x58</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>sync_enabled</key>
+                <description>SYNC DECK4</description>
+                <status>0x93</status>
+                <midino>0x58</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK (DECK1)</description>
+                <status>0x90</status>
+                <midino>0x5E</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK (DECK2)</description>
+                <status>0x91</status>
+                <midino>0x5E</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK (DECK3)</description>
+                <status>0x92</status>
+                <midino>0x5E</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK (DECK4)</description>
+                <status>0x93</status>
+                <midino>0x5E</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD (DECK1)</description>
+                <status>0x90</status>
+                <midino>0x5F</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD (DECK2)</description>
+                <status>0x91</status>
+                <midino>0x5F</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD (DECK3)</description>
+                <status>0x92</status>
+                <midino>0x5F</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD (DECK4)</description>
+                <status>0x93</status>
+                <midino>0x5F</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK LONG (DECK1)</description>
+                <status>0x90</status>
+                <midino>0x61</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK LONG (DECK2)</description>
+                <status>0x91</status>
+                <midino>0x61</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK LONG (DECK3)</description>
+                <status>0x92</status>
+                <midino>0x61</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK LONG (DECK4)</description>
+                <status>0x93</status>
+                <midino>0x61</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD LONG (DECK1)</description>
+                <status>0x90</status>
+                <midino>0x62</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD LONG (DECK2)</description>
+                <status>0x91</status>
+                <midino>0x62</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD LONG (DECK3)</description>
+                <status>0x92</status>
+                <midino>0x62</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD LONG (DECK4)</description>
+                <status>0x93</status>
+                <midino>0x62</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Master]</group>
+                <key>DDJFLX10.waveformZoom</key>
+                <description>Waveform Zoom Encoder</description>
+                <status>0xB6</status>
+                <midino>0x64</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Library]</group>
+                <key>MoveFocusBackward</key>
+                <description>Move Focus Backward - Back button</description>
+                <status>0x96</status>
+                <midino>0x65</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.jogTouchHandler</key>
+                <description>JOG PLATTER TOUCH +SHIFT (DECK1)</description>
+                <status>0x90</status>
+                <midino>0x67</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.jogTouchHandler</key>
+                <description>JOG PLATTER TOUCH +SHIFT (DECK2)</description>
+                <status>0x91</status>
+                <midino>0x67</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.jogTouchHandler</key>
+                <description>JOG PLATTER TOUCH +SHIFT (DECK3)</description>
+                <status>0x92</status>
+                <midino>0x67</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.jogTouchHandler</key>
+                <description>JOG PLATTER TOUCH +SHIFT (DECK4)</description>
+                <status>0x93</status>
+                <midino>0x67</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK +SHIFT (DECK1)</description>
+                <status>0x90</status>
+                <midino>0x70</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK +SHIFT (DECK2)</description>
+                <status>0x91</status>
+                <midino>0x70</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK +SHIFT (DECK3)</description>
+                <status>0x92</status>
+                <midino>0x70</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.beatjumpBackward</key>
+                <description>BEAT JUMP BACK +SHIFT (DECK4)</description>
+                <status>0x93</status>
+                <midino>0x70</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD +SHIFT (DECK1)</description>
+                <status>0x90</status>
+                <midino>0x71</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD +SHIFT (DECK2)</description>
+                <status>0x91</status>
+                <midino>0x71</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD +SHIFT (DECK3)</description>
+                <status>0x92</status>
+                <midino>0x71</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>DDJFLX10.beatjumpForward</key>
+                <description>BEAT JUMP FWD +SHIFT (DECK4)</description>
+                <status>0x93</status>
+                <midino>0x71</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Library]</group>
+                <key>MoveFocusForward</key>
+                <description>Move Focus Forward - View button</description>
+                <status>0x96</status>
+                <midino>0x7A</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+        </controls>
+        <outputs>
+            <output>
+                <group>[Channel1]</group>
+                <key>cue_indicator</key>
+                <description>CUE LED</description>
+                <status>0x90</status>
+                <midino>0x48</midino>
+            </output>
+            <output>
+                <group>[Channel1]</group>
+                <key>pfl</key>
+                <description>HEADPHONE CUE LED</description>
+                <status>0x90</status>
+                <midino>0x54</midino>
+            </output>
+            <output>
+                <group>[Channel1]</group>
+                <key>play</key>
+                <description>PLAY/PAUSE LED</description>
+                <status>0x90</status>
+                <midino>0x0B</midino>
+            </output>
+            <output>
+                <group>[Channel2]</group>
+                <key>cue_indicator</key>
+                <description>CUE LED</description>
+                <status>0x91</status>
+                <midino>0x0C</midino>
+            </output>
+            <output>
+                <group>[Channel2]</group>
+                <key>pfl</key>
+                <description>HEADPHONE CUE LED</description>
+                <status>0x91</status>
+                <midino>0x54</midino>
+            </output>
+            <output>
+                <group>[Channel2]</group>
+                <key>play</key>
+                <description>PLAY/PAUSE LED</description>
+                <status>0x91</status>
+                <midino>0x0B</midino>
+            </output>
+            <output>
+                <group>[QuickEffectRack1_[Channel1]]</group>
+                <key>enabled</key>
+                <description>COLOR FX ASSIGN DECK1 LED</description>
+                <status>0x90</status>
+                <midino>0x1C</midino>
+            </output>
+            <output>
+                <group>[QuickEffectRack1_[Channel2]]</group>
+                <key>enabled</key>
+                <description>COLOR FX ASSIGN DECK2 LED</description>
+                <status>0x91</status>
+                <midino>0x1D</midino>
+            </output>
+            <output>
+                <group>[QuickEffectRack1_[Channel3]]</group>
+                <key>enabled</key>
+                <description>COLOR FX ASSIGN DECK3 LED</description>
+                <status>0x92</status>
+                <midino>0x1E</midino>
+            </output>
+            <output>
+                <group>[QuickEffectRack1_[Channel4]]</group>
+                <key>enabled</key>
+                <description>COLOR FX ASSIGN DECK4 LED</description>
+                <status>0x93</status>
+                <midino>0x1F</midino>
+            </output>
+        </outputs>
+    </controller>
+</MixxxControllerPreset>

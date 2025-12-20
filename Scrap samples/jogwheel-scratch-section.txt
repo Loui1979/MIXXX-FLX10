@@ -1,0 +1,57 @@
+// Jog wheel constants
+PioneerDDJFLX4.vinylMode = true;
+PioneerDDJFLX4.alpha = 1.0/8;
+PioneerDDJFLX4.beta = PioneerDDJFLX4.alpha/32;
+
+// Multiplier for fast seek through track using SHIFT+JOGWHEEL
+PioneerDDJFLX4.fastSeekScale = 150;
+PioneerDDJFLX4.bendScale = 0.8;
+
+// Jog wheel touch - enables scratching
+PioneerDDJFLX4.jogTouch = function(channel, _control, value) {
+    const deckNum = channel + 1;
+
+    // skip while adjusting the loop points
+    if (PioneerDDJFLX4.loopAdjustIn[channel] || PioneerDDJFLX4.loopAdjustOut[channel]) {
+        return;
+    }
+
+    if (value !== 0 && this.vinylMode) {
+        engine.scratchEnable(deckNum, 720, 33+1/3, this.alpha, this.beta);
+    } else {
+        engine.scratchDisable(deckNum);
+    }
+};
+
+// Jog wheel turn - handles scratching and pitch bending
+PioneerDDJFLX4.jogTurn = function(channel, _control, value, _status, group) {
+    const deckNum = channel + 1;
+    let newVal = value - 64;
+
+    // loop_in / out adjust
+    const loopEnabled = engine.getValue(group, "loop_enabled");
+    if (loopEnabled > 0) {
+        if (PioneerDDJFLX4.loopAdjustIn[channel]) {
+            newVal = newVal * PioneerDDJFLX4.loopAdjustMultiply + engine.getValue(group, "loop_start_position");
+            engine.setValue(group, "loop_start_position", newVal);
+            return;
+        }
+        if (PioneerDDJFLX4.loopAdjustOut[channel]) {
+            newVal = newVal * PioneerDDJFLX4.loopAdjustMultiply + engine.getValue(group, "loop_end_position");
+            engine.setValue(group, "loop_end_position", newVal);
+            return;
+        }
+    }
+
+    if (engine.isScratching(deckNum)) {
+        engine.scratchTick(deckNum, newVal);
+    } else { // fallback
+        engine.setValue(group, "jog", newVal * this.bendScale);
+    }
+};
+
+// Fast seek with SHIFT+JOGWHEEL
+PioneerDDJFLX4.jogSearch = function(_channel, _control, value, _status, group) {
+    const newVal = (value - 64) * PioneerDDJFLX4.fastSeekScale;
+    engine.setValue(group, "jog", newVal);
+};

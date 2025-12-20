@@ -1,0 +1,184 @@
+<!-- Hotcue Pads Outputs/LEDs (Deck 1/Left) -->
+<!!OLD NOT OBSOLETE!!>
+<!!SWITCHED TO ALL SCRIPT HANDLED!!>
+<output>
+    <group>[Channel1]</group>
+    <key>hotcue_1_enabled</key>
+    <description>PAD 1 DECK1 LED</description>
+    <status>0x97</status>
+    <midino>0x00</midino>
+    <minimum>0</minimum>
+    <options>
+        <Script-Binding/>
+    </options>
+</output>
+<output>
+    <group>[Channel1]</group>
+    <key>hotcue_2_enabled</key>
+    <description>PAD 2 DECK1 LED</description>
+    <status>0x97</status>
+    <midino>0x01</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel1]</group>
+    <key>hotcue_3_enabled</key>
+    <description>PAD 3 DECK1 LED</description>
+    <status>0x97</status>
+    <midino>0x02</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel1]</group>
+    <key>hotcue_4_enabled</key>
+    <description>PAD 4 DECK1 LED</description>
+    <status>0x97</status>
+    <midino>0x03</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel1]</group>
+    <key>hotcue_5_enabled</key>
+    <description>PAD 5 DECK1 LED</description>
+    <status>0x97</status>
+    <midino>0x04</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel1]</group>
+    <key>hotcue_6_enabled</key>
+    <description>PAD 6 DECK1 LED</description>
+    <status>0x97</status>
+    <midino>0x05</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel1]</group>
+    <key>hotcue_7_enabled</key>
+    <description>PAD 7 DECK1 LED</description>
+    <status>0x97</status>
+    <midino>0x06</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel1]</group>
+    <key>hotcue_8_enabled</key>
+    <description>PAD 8 DECK1 LED</description>
+    <status>0x97</status>
+    <midino>0x07</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+
+
+<!-- Hotcue Pads Outputs/LEDs (Deck 2/Right) -->
+
+<output>
+    <group>[Channel2]</group>
+    <key>hotcue_1_enabled</key>
+    <description>PAD 1 DECK2 LED</description>
+    <status>0x99</status>
+    <midino>0x00</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel2]</group>
+    <key>hotcue_2_enabled</key>
+    <description>PAD 2 DECK2 LED</description>
+    <status>0x99</status>
+    <midino>0x01</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel2]</group>
+    <key>hotcue_3_enabled</key>
+    <description>PAD 3 DECK2 LED</description>
+    <status>0x99</status>
+    <midino>0x02</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel2]</group>
+    <key>hotcue_4_enabled</key>
+    <description>PAD 4 DECK2 LED</description>
+    <status>0x99</status>
+    <midino>0x03</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel2]</group>
+    <key>hotcue_5_enabled</key>
+    <description>PAD 5 DECK2 LED</description>
+    <status>0x99</status>
+    <midino>0x04</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel2]</group>
+    <key>hotcue_6_enabled</key>
+			<description>PAD 6 DECK2 LED</description>
+    <status>0x99</status>
+    <midino>0x05</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel2]</group>
+    <key>hotcue_7_enabled</key>
+			<description>PAD 7 DECK2 LED</description>
+    <status>0x99</status>
+    <midino>0x06</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[Channel2]</group>
+    <key>hotcue_8_enabled</key>
+    			<description>PAD 8 DECK2 LED</description>
+    <status>0x99</status>
+    <midino>0x07</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+

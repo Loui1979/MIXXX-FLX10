@@ -1,0 +1,110 @@
+Effects  scratch pad
+
+
+
+<!-- Color FX Buttons Inputs -->
+<!--   -->
+<!--  ON the board there is Space(F2), crush(f4), Noise(f6) and Echo(F3), pitch(F5), filter(F7)  in two columns in that order --->
+<!--							-->
+<!--  Name	    Shift	    Diagram	Status	Data1	Dat2	on/off	-->
+<!--  Space		            (F2)	96	    2	    0x00/0x0F	-->
+<!--  Space	    Yes	        (F2)	96	    8	    0x00/0x0F	-->
+<!--  Crush 	            (F4)	96	    1	    0x00/0x0F	-->
+<!--  Crush 	Yes	        (F4)	96	    9	    0x00/0x0F	-->
+<!--  Noise	                (F6)	96	    2	    0x00/0x0F	-->
+<!--  Noise	    Yes	        (F6)	96	    10	    0x00/0x0F	-->
+<!--  Echo		            (F3)	96	    3	    0x00/0x0F	-->
+<!--  Echo	    Yes	        (F3)	96	    11	    0x00/0x0F	-->
+<!--  pitch		            (F5)	96	    4	    0x00/0x0F	-->
+<!--  pitch	    Yes	        (F5)	96	    12	    0x00/0x0F	-->
+<!--  filter		        (F7)	96	    5	    0x00/0x0F	-->
+<!--  filter	Yes	        (F7)	96	    13	    0x00/0x0F	-->
+
+<output>
+    <group>[QuickEffectRack1_[Channel1]]</group>
+    <key>enabled</key>
+    <description>COLOR FX ASSIGN DECK1 LED</description>
+    <status>0x90</status>
+    <midino>0x1C</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[QuickEffectRack1_[Channel2]]</group>
+    <key>enabled</key>
+    <description>COLOR FX ASSIGN DECK2 LED</description>
+    <status>0x91</status>
+    <midino>0x1D</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[QuickEffectRack1_[Channel3]]</group>
+    <key>enabled</key>
+    <description>COLOR FX ASSIGN DECK3 LED</description>
+    <status>0x92</status>
+    <midino>0x1E</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output>
+<output>
+    <group>[QuickEffectRack1_[Channel4]]</group>
+    <key>enabled</key>
+    <description>COLOR FX ASSIGN DECK4 LED</description>
+    <status>0x93</status>
+    <midino>0x1F</midino>
+    <minimum>0</minimum>
+    <options>
+        <normal/>
+    </options>
+</output> 	
+
+<control>
+    <group>[QuickEffectRack1_[Channel1]]</group>
+    <key>enabled</key>
+			    <description>COLOR FX ASSIGN DECK1 PRESS</description>
+    <status>0x90</status>
+    <midino>0x1C</midino>
+    <options>
+        <normal/>
+    </options>
+</control>
+<control>
+    <group>[QuickEffectRack1_[Channel2]]</group>
+    <key>enabled</key>
+    			<description>COLOR FX ASSIGN DECK2 PRESS</description>
+    <status>0x91</status>
+    <midino>0x1D</midino>
+    <options>
+        <normal/>
+    </options>
+</control>
+<control>
+    <group>[QuickEffectRack1_[Channel3]]</group>
+    <key>enabled</key>
+			    <description>COLOR FX ASSIGN DECK3 PRESS</description>
+    <status>0x92</status>
+    <midino>0x1E</midino>
+    <options>
+        <normal/>
+    </options>
+</control>
+<control>
+    <group>[QuickEffectRack1_[Channel4]]</group>
+    <key>enabled</key>
+			    <description>COLOR FX ASSIGN DECK4 PRESS</description>
+    <status>0x93</status>
+    <midino>0x1F</midino>
+    <options>
+        <normal/>
+    </options>
+</control>
+
+
+

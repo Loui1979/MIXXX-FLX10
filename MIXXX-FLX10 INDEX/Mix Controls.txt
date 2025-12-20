@@ -1,0 +1,929 @@
+Mix Controls
+  In the Pioneer DDJ-FLX10 JavaScript mapping for Mixxx  handlers are JavaScript functions that process incoming MIDI signals from the controller or respond to changes in Mixxx's internal state (e.g., via engine callbacks). They calculate actions or outputs based on MIDI data (status, control, value) and use mathematical multipliers (e.g., padMultiplier = 0x08) to derive pad modes/pages without hardcoding. This keeps the code efficient and tied to the controller's hex patterns.
+Groups are string identifiers like [Channel1] or [Sampler1] that represent Mixxx components (decks, samplers, etc.). They organize controls (e.g., play, hotcue_1_enabled) and are used in functions like engine.setValue(group, key, value) to target specific decks. In our script, groups are derived dynamically from MIDI status bytes (e.g., 0x90 for Channel 1), allowing deck-specific actions without explicit switching.
+Key Handlers
+
+
+
+
+
+
+///////////////////////////////   
+Groups and Containers
+
+Groups like [Channel1] are used throughout for deck targeting (e.g., in engine.getValue(group, 'hotcue_1_color') for LED colors).
+We use components.ComponentContainer for organization: 4 channelContainers (one per group) group elements like VU meters; 4 padContainers nest pad logic per channel. This modularizes code without deck switching, as MIDI channels map directly to groups.
+
+Everything that doesn't need logic, or the logic is performed by mix or the controller is simply mapped in the xml. This approach minimizes XML (only for non-pad inputs like jog touch or mode buttons) and maximizes built-ins for reliability, per Mixxx wiki/docs on MIDI scripting. For full details, see Mixxx's MIDI Scripting wiki.
+
+
+Here is a list of included (options) that are functions already included in Mixxx
+
+
+
+///////////////////////					//////////////
+padInputHandler: Called on pad MIDI input (NOTE/CC). Derives group from status, computes page/pad via multipliers (e.g., relativeControl = control - (modeIndex * padMultiplier * 2)), and triggers built-ins (e.g., engine.setValue(group, 'hotcue_' + cueNum + '_activate', 1) for hotcues). No XML needed; registered in init() with midi.makeInputHandler.
+jogInputHandler: Processes jog rotation CC (e.g., control 0x22 for vinyl scratch). Derives group from status, calculates delta (value - 64), and applies built-ins like engine.scratchTick(channelNum, delta) or engine.setValue(group, 'jog', delta * bendScale).
+updatePadLed / updateJogRing / updateJogDisplay: Engine-connected callbacks (via engine.connectControl(group, key, handler)) for outputs. E.g., updatePadLed recomputes MIDI control with multipliers, maps colors (1-127), and sends via midi.sendShortMsg(status, midiControl, colorValue).
+setPadMode: From XML-bound mode buttons; updates padModes[group] and refreshes LEDs.
+//////////////////////					///////////
+
+
+[ChannelN]hotcue_X_activate
+[PreviewDeckN]hotcue_X_activate
+[SamplerN]hotcue_X_activate
+If hotcue X is not set, this sets a hotcue at the current play position and saves it as hotcue X of type “Hotcue”. In case a loop is currently enabled (i.e. if [ChannelN],loop_enabled is set to 1), the loop will be saved as hotcue X instead and hotcue_X_type will be set to “Loop”. If hotcue X has been set as a regular cue point, the player seeks to the saved play position.
+If hotcue_X_type is “Loop”, looping will be enabled and the loop controls (e.g. loop_start_position, loop_end_position and beatloop_size) will be set accordingly. Just like reloop_toggle, the player seeks back to the loop start when the current play position is behind the loop, and enabled without a seek when it is in front of or inside the loop. This allows a loop catching behavior on one hand and a jump back when the loop has been exit by just triggering this control.
+Setting the control to 1 when the track is currently not playing (i.e. play is set to 0) will start hotcue previewing. After resetting the control to 0, playback will usually be stopped and the player will seek to the hotcue position. If play is set to 1 while previewing is active, the playback will continue and no seek occurs.
+
+Range : binary
+Feedback : Player may change position. Hotcue X marker may change on waveform.
+
+New in version 1.8.0.
+Changed in version 2.4.0: Added support for saved loops.
+
+[ChannelN]hotcue_X_activatecue
+[PreviewDeckN]hotcue_X_activatecue
+[SamplerN]hotcue_X_activatecue
+Identical to hotcue_X_activate, but this always sets a regular cue point, regardless of whether a loop is enabled or not. This control can be used for controllers that have dedicated hotcue/saved loop pad modes.
+
+New in version 2.4.0.
+
+[ChannelN]hotcue_X_activateloop
+[PreviewDeckN]hotcue_X_activateloop
+[SamplerN]hotcue_X_activateloop
+Identical to hotcue_X_activate, but this always sets a saved loop, regardless of whether a loop is enabled or not. If no loop is available, this sets and enables a beat loop of of beatloop_size. If the loaded track has no beat grid, seconds are used instead of beats.
+
+This control can be used for controllers that have dedicated hotcue/saved loop pad modes.
+
+New in version 2.4.0.
+
+[ChannelN]hotcue_X_cueloop
+[PreviewDeckN]hotcue_X_cueloop
+[SamplerN]hotcue_X_cueloop
+Enables or disables a loop from the position of hotcue X. If X is a saved loop, that loop will be used, otherwise it will set a beatloop of beatloop_size from the cue position. If the loaded track has no beat grid, seconds are used instead of beats. In case the hotcue is not set, this control will set a regular cue point at the current position and start a beatloop.
+
+This control can be used to map the primary action of the “Cue Loop” performance pad mode on Serato-style controllers.
+
+New in version 2.4.0.
+
+[ChannelN]hotcue_X_clear
+[PreviewDeckN]hotcue_X_clear
+[SamplerN]hotcue_X_clear
+If hotcue X is set, clears its hotcue status.
+
+Range
+:
+binary
+
+Feedback
+:
+Hotcue X marker changes on waveform.
+
+New in version 1.8.0.
+
+[ChannelN]hotcue_X_color
+[PreviewDeckN]hotcue_X_color
+[SamplerN]hotcue_X_color
+Color of hotcue X or -1 if the hotcue is not set.
+
+Range : 3-Byte RGB color code (or -1)
+
+Feedback : Color of Hotcue X button and waveform marker changes.
+
+New in version 2.3.0.
+
+[ChannelN]hotcue_X_status
+[PreviewDeckN]hotcue_X_status
+[SamplerN]hotcue_X_status
+Indicates if hotcue slot X is set, active or empty.
+
+Range (read-only) : Value
+
+Meaning 
+
+0 Hotcue X is not set
+1 Hotcue X is set
+2 Hotcue X is active (saved loop is enabled or hotcue is previewing)
+
+New in version 2.4.0: Replaces the deprecated [ChannelN],hotcue_X_enabled.
+
+[ChannelN]hotcue_X_type
+[PreviewDeckN]hotcue_X_type
+[SamplerN]hotcue_X_type
+Indicates the type of the hotcue in hotcue slot X.
+
+Range (read-only)
+:
+Value
+
+Type
+
+0
+
+Invalid/Not Set
+
+1
+
+Hotcue
+
+4
+
+Saved Loop
+
+New in version 2.4.0.
+
+[ChannelN]hotcue_X_goto
+[PreviewDeckN]hotcue_X_goto
+[SamplerN]hotcue_X_goto
+If hotcue X is set, seeks the player to hotcue X’s position.
+
+Range : binary
+
+Feedback : Player may change position.
+
+New in version 1.8.0.
+
+[ChannelN]hotcue_X_gotoandplay
+[PreviewDeckN]hotcue_X_gotoandplay
+[SamplerN]hotcue_X_gotoandplay
+If hotcue X is set, seeks the player to hotcue X’s position and starts playback.
+
+Range
+:
+binary
+
+Feedback
+:
+Player may change position.
+
+New in version 1.11.0.
+
+[ChannelN]hotcue_X_gotoandloop
+[PreviewDeckN]hotcue_X_gotoandloop
+[SamplerN]hotcue_X_gotoandloop
+If hotcue X is set, seeks the player to hotcue X’s position, starts playback and looping. If the hotcue is a saved loop, the loop is enabled, otherwise a beatloop of beatloop_size is set from the hotcue’s position. If the loaded track has no beat grid, seconds are used instead of beats.
+
+This control can be used to map the secondary action of the “Cue Loop” performance pad mode on Serato-style controllers.
+
+Range : binary
+
+Feedback
+:
+Player may change position and looping is enabled.
+
+New in version 2.4.0.
+
+[ChannelN]hotcue_X_gotoandstop
+[PreviewDeckN]hotcue_X_gotoandstop
+[SamplerN]hotcue_X_gotoandstop
+If hotcue X is set, seeks the player to hotcue X’s position and stops.
+
+Range
+:
+binary
+
+Feedback
+:
+Player may change position.
+
+New in version 1.8.0.
+
+[ChannelN]hotcue_X_position
+[PreviewDeckN]hotcue_X_position
+[SamplerN]hotcue_X_position
+The position of hotcue X in samples, -1 if not set.
+
+Range
+:
+positive integer
+
+Feedback
+:
+Hotcue X marker changes on waveform.
+
+New in version 1.8.0.
+
+[ChannelN]hotcue_X_set
+[PreviewDeckN]hotcue_X_set
+[SamplerN]hotcue_X_set
+Set a hotcue at the current play position and saves it as hotcue X of type “Hotcue”. In case a loop is currently enabled (i.e. if [ChannelN],loop_enabled is set to 1), the loop will be saved as hotcue X instead and hotcue_X_type will be set to “Loop”.
+
+Range
+:
+binary
+
+Feedback
+:
+Hotcue X marker changes on waveform.
+
+New in version 1.8.0.
+
+Changed in version 2.4.0.
+
+[ChannelN]hotcue_X_setcue
+[PreviewDeckN]hotcue_X_setcue
+[SamplerN]hotcue_X_setcue
+Identical to hotcue_X_set, but this always sets a regular cue point (i.e. hotcue_X_type “Hotcue”), regardless of whether a loop is enabled or not.
+
+This control can be used for controllers that have dedicated hotcue/saved loop pad modes.
+
+New in version 2.4.0.
+
+[ChannelN]hotcue_X_setloop
+[PreviewDeckN]hotcue_X_setloop
+[SamplerN]hotcue_X_setloop
+Identical to hotcue_X_set, but this always saves a loop (i.e. hotcue_X_type “Loop”), regardless of whether a loop is enabled or not. If no loop is available, this sets and enables a beat loop of of beatloop_size. If the loaded track has no beat grid, seconds are used instead of beats.
+
+This control can be used for controllers that have dedicated hotcue/saved loop pad modes.
+
+New in version 2.4.0.
+
+[ChannelN]hotcue_focus
+[PreviewDeckN]hotcue_focus
+[SamplerN]hotcue_focus
+Contains the number of the most recently used hotcue (or -1 if no hotcue was used).
+
+Range
+:
+positive integer (or -1)
+
+Feedback
+:
+None
+
+New in version 2.3.0.
+
+[ChannelN]hotcue_focus_color_prev
+[PreviewDeckN]hotcue_focus_color_prev
+[SamplerN]hotcue_focus_color_prev
+If there is a focused hotcue, sets its color to the previous color in the palette.
+
+Range
+:
+binary
+
+Feedback
+:
+Color of focused hotcue button and waveform marker changes.
+
+New in version 2.3.0.
+
+[ChannelN]hotcue_focus_color_next
+[PreviewDeckN]hotcue_focus_color_next
+[SamplerN]hotcue_focus_color_next
+If there is a focused hotcue, sets its color to the next color in the palette.
+
+Range
+:
+binary
+
+Feedback
+:
+Color of focused hotcue button and waveform marker changes.
+
+New in version 2.3.0.
+
+[ChannelN]intro_end_activate
+[PreviewDeckN]intro_end_activate
+[SamplerN]intro_end_activate
+If the intro end cue is set, seeks the player to the intro end position. If the intro end is not set, sets the intro end to the current play position.
+
+Range
+:
+binary
+
+Feedback
+:
+Player may change position. Intro end marker may change on waveform.
+
+New in version 2.3.0.
+
+
+[ChannelN]intro_end_clear
+[PreviewDeckN]intro_end_clear
+[SamplerN]intro_end_clear
+If the intro end cue is set, clears its status.
+
+Range
+:
+binary
+
+Feedback
+:
+Intro end marker changes on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]intro_end_enabled
+[PreviewDeckN]intro_end_enabled
+[SamplerN]intro_end_enabled
+1 if intro end cue is set, (position is not -1), 0 otherwise.
+
+Range
+:
+binary, read-only
+
+Feedback
+:
+Intro end button lights up.
+
+New in version 2.3.0.
+
+[ChannelN]intro_end_position
+[PreviewDeckN]intro_end_position
+[SamplerN]intro_end_position
+The position of the intro end in samples, -1 if not set.
+
+Range
+:
+positive integer
+
+Feedback
+:
+Intro end marker changes on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]intro_end_set
+[PreviewDeckN]intro_end_set
+[SamplerN]intro_end_set
+Set intro end to the current play position. If intro end was previously set, it is moved to the new position.
+
+Range
+:
+binary
+
+Feedback
+:
+Intro end marker changes on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]intro_start_activate
+[PreviewDeckN]intro_start_activate
+[SamplerN]intro_start_activate
+If the intro start cue is set, seeks the player to the intro start position. If the intro start is not set, sets the intro start to the current play position.
+
+Range
+:
+binary
+
+Feedback
+:
+Player may change position. Intro start marker may change on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]intro_start_clear
+[PreviewDeckN]intro_start_clear
+[SamplerN]intro_start_clear
+If the intro start cue is set, clears its status.
+
+Range
+:
+binary
+
+Feedback
+:
+Intro start marker changes on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]intro_start_enabled
+[PreviewDeckN]intro_start_enabled
+[SamplerN]intro_start_enabled
+1 if intro start cue is set, (position is not -1), 0 otherwise.
+
+Range
+:
+binary, read-only
+
+Feedback
+:
+Intro start button lights up.
+
+New in version 2.3.0.
+
+[ChannelN]intro_start_position
+[PreviewDeckN]intro_start_position
+[SamplerN]intro_start_position
+The position of the intro start in samples, -1 if not set.
+
+Range : positive integer
+
+Feedback : Intro start marker changes on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]intro_start_set
+[PreviewDeckN]intro_start_set
+[SamplerN]intro_start_set
+Set intro start to the current play position. If intro start was previously set, it is moved to the new position.
+
+Range
+:
+binary
+
+Feedback
+:
+Intro start marker changes on waveform.
+
+New in version 2.3.0.
+
+
+[ChannelN]outro_end_activate
+[PreviewDeckN]outro_end_activate
+[SamplerN]outro_end_activate
+If the outro end cue is set, seeks the player to the outro end position. If the outro end is not set, sets the outro end to the current play position.
+
+Range
+:
+binary
+
+Feedback
+:
+Player may change position. Outro end marker may change on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]outro_end_clear
+[PreviewDeckN]outro_end_clear
+[SamplerN]outro_end_clear
+If the outro end cue is set, clears its status.
+
+Range
+:
+binary
+
+Feedback
+:
+Outro end marker changes on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]outro_end_enabled
+[PreviewDeckN]outro_end_enabled
+[SamplerN]outro_end_enabled
+1 if outro end cue is set, (position is not -1), 0 otherwise.
+
+Range
+:
+binary, read-only
+
+Feedback
+:
+Outro end button lights up.
+
+New in version 2.3.0.
+
+[ChannelN]outro_end_position
+[PreviewDeckN]outro_end_position
+[SamplerN]outro_end_position
+The position of the outro end in samples, -1 if not set.
+
+Range
+:
+positive integer
+
+Feedback
+:
+Outro end marker changes on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]outro_end_set
+[PreviewDeckN]outro_end_set
+[SamplerN]outro_end_set
+Set outro end to the current play position. If outro end was previously set, it is moved to the new position.
+
+Range
+:
+binary
+
+Feedback
+:
+Outro end marker changes on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]outro_start_activate
+[PreviewDeckN]outro_start_activate
+[SamplerN]outro_start_activate
+If the outro start cue is set, seeks the player to the outro start position. If the outro start is not set, sets the outro start to the current play position.
+
+Range
+:
+binary
+
+Feedback
+:
+Player may change position. Outro start marker may change on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]outro_start_clear
+[PreviewDeckN]outro_start_clear
+[SamplerN]outro_start_clear
+If the outro start cue is set, clears its status.
+
+Range
+:
+binary
+
+Feedback
+:
+Outro start marker changes on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]outro_start_enabled
+[PreviewDeckN]outro_start_enabled
+[SamplerN]outro_start_enabled
+1 if outro start cue is set, (position is not -1), 0 otherwise.
+
+Range
+:
+binary, read-only
+
+Feedback
+:
+Outro start button lights up.
+
+New in version 2.3.0.
+
+[ChannelN]outro_start_position
+[PreviewDeckN]outro_start_position
+[SamplerN]outro_start_position
+The position of the outro start in samples, -1 if not set.
+
+Range
+:
+positive integer
+
+Feedback
+:
+Outro start marker changes on waveform.
+
+New in version 2.3.0.
+
+[ChannelN]outro_start_set
+[PreviewDeckN]outro_start_set
+[SamplerN]outro_start_set
+Set outro start to the current play position. If outro start was previously set, it is moved to the new position.
+
+Range
+:
+binary
+
+Feedback
+:
+Outro start marker changes on waveform.
+
+
+
+
+Below is a list of mixxx <key>  controls or functions built into mixxx from the Mixxx controls manual
+
+
+
+[ChannelN]playposition
+[PreviewDeckN]playposition
+[SamplerN]playposition
+Sets the absolute position in the track.
+This is a ControlPotMeter control.
+Range:-0.14 to 1.14 (0 = beginning -> Midi 14, 1 = end -> Midi 114)
+Feedback:Waveform
+
+
+[ChannelN]vu_meter
+[ChannelN]waveform_zoom
+
+[ChannelN]waveform_zoom_up
+[ChannelN]waveform_zoom_down
+[Library]MoveFocusForward
+[Library]MoveFocusBackward
+[Master]PeakIndicatorL
+[Master]PeakIndicatorR
+[Master]VuMeterL deprecated   use [Main],vu_meter_l instead.
+
+[Master]VuMeterR deprecated   [Main],vu_meter_r instead.
+
+[Skin],show_maximized_library
+
+
+[ChannelN]sync_master   deprecated -  use   [ChannelN],sync_leader, [PreviewDeckN],sync_leader and [SamplerN],sync_leader instead.
+Sets deck as leader clock.
+If enabled, the Sync button stays lit and tempo slider snap to the appropriate value. Slider adjustments are linked on all decks that have sync lock enabled.
+
+
+
+[ChannelN]beatloop deprecated   Use [ChannelN],beatloop_size and [ChannelN],beatloop_activate instead.
+[PreviewDeckN]beatloopdeprecated -  use
+[SamplerN]beatloopdeprecated -  use
+Setup a loop over the set number of beats.
+If the loaded track has no beat grid, seconds are used instead of beats.
+Range positive real number
+Feedback : A loop is shown over the set number of beats.
+
+
+[ChannelN]reloop_exit  deprecated -  use*
+[PreviewDeckN]reloop_exitdeprecated -  use*
+[SamplerN]reloop_exitdeprecated -  use*
+Toggles the current loop on or off. If the loop is ahead of the current play position, the track will keep playing normally until it reaches the loop.
+Feedback: Loop range in waveform activates or deactivates.
+Deprecated since version 2.1.0: * Use [ChannelN],reloop_toggle instead.
+
+
+[ChannelN]jogdeprecated 
+[PreviewDeckN]jogdeprecated 
+[SamplerN]jogdeprecated 
+Affects relative playback speed and direction for short instances (additive & is automatically reset to 0).
+Range : -3.0..3.0
+Feedback : waveform
+Deprecated since version ??: Use the JavaScript engine.scratch functions instead.
+
+
+[ChannelN]scratch  deprecated -  use    [ChannelN]engine.scratch    instead.
+[PreviewDeckN]scratch
+[SamplerN]scratch
+Affects playback speed and direction (differently whether currently playing or not) (multiplicative).
+Range:   -3.0..3.0
+Deprecated since version ??: Use the JavaScript engine.scratch functions instead.
+
+
+[ChannelN]VuMeter deprecated to vu_meter
+
+[ChannelN]beatjump
+[ChannelN]beatjump_size
+[ChannelN]beatjump_size_halve
+[ChannelN]beatjump_size_double
+[ChannelN]beatjump_forward
+[ChannelN]beatjump_backward
+beatloop_size
+Set the length of the loop in beats that will get set with beatloop_activate and beatlooproll_activate. Changing this will resize an existing loop if the length of the loop matches beatloop_size.
+
+If the loaded track has no beat grid, seconds are used instead of beats.
+
+beatloop_rX_activate
+Activates a loop over X beats backwards from the current position. A control exists for X = 0.03125, 0.0625, 0.125, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512
+
+If the loaded track has no beat grid, seconds are used instead of beats.
+Beatloop X button in skin is lit. A loop overlay is shown over X beats on waveform. The slip mode toggle is activated.
+
+beatjump_X_forward
+beatjump_X_backward
+
+
+[ChannelN]cue_cdj
+[PreviewDeckN]cue_cdj
+[SamplerN]cue_cdj
+Represents a Cue button that is always in CDJ mode.
+
+
+[ChannelN]cue_clear
+[PreviewDeckN]cue_clear
+[SamplerN]cue_clear
+Deletes the already set cue point and sets [ChannelN],cue_point to -1.
+
+
+[ChannelN]cue_goto
+[PreviewDeckN]cue_goto
+[SamplerN]cue_goto
+If the cue point is set, recalls the cue point.
+Feedback   Player may change position
+
+[ChannelN]cue_default
+[PreviewDeckN]cue_default
+[SamplerN]cue_default
+In CDJ mode, when playing, returns to the cue point and pauses. If stopped, sets a cue point at the current location. If stopped and at a cue point, plays from that point until released (set to 0.)
+Feedback:Cue button
+
+
+[ChannelN]cue_gotoandplay
+[PreviewDeckN]cue_gotoandplay
+[SamplerN]cue_gotoandplay
+If the cue point is set, seeks the player to it and starts playback.
+
+Feedback:Player may change position and start playing.
+
+
+
+[ChannelN]cue_gotoandstop
+[PreviewDeckN]cue_gotoandstop
+[SamplerN]cue_gotoandstop
+If the cue point is set, seeks the player to it and stops.
+Feedback : Player may change position.
+
+
+
+[ChannelN]cue_indicator
+[PreviewDeckN]cue_indicator
+[SamplerN]cue_indicator
+Indicates the blinking pattern of the CUE button (i.e. 1.0 if the button is illuminated, 0.0 otherwise), depending on the chosen cue mode.
+Feedback:Cue button
+
+
+
+[ChannelN]cue_mode
+[PreviewDeckN]cue_mode
+[SamplerN]cue_mode
+Represents the currently chosen cue mode.
+Range : Value
+compatible hardware 
+0.0   Mixxx mode (default) 
+1.0   Pioneer mode
+2.0   Denon mode 
+3.0   Numark mode 
+4.0   Mixxx mode (no blinking) 
+5.0   CUP (Cue + Play) mode
+
+
+[ChannelN]cue_play
+[PreviewDeckN]cue_play
+[SamplerN]cue_play
+Go to cue point and play after release (CUP button behavior). If stopped, sets a cue point at the current location.
+
+
+
+[ChannelN]cue_point - cue point postion
+[PreviewDeckN]cue_point
+[SamplerN]cue_point
+The current position of the cue point in samples.
+Feedback : Cue point marker
+
+
+[ChannelN]cue_preview
+[PreviewDeckN]cue_preview
+[SamplerN]cue_preview
+Plays from the current cue point.
+Feedback : Cue button lights and waveform moves
+
+[ChannelN]cue_set
+[PreviewDeckN]cue_set
+[SamplerN]cue_set
+Sets a cue point at the current location.
+Feedback : Cue mark appears on the waveform
+
+[ChannelN]cue_simple
+[PreviewDeckN]cue_simple
+[SamplerN]cue_simple
+If the player is not playing, set the cue point at the current location otherwise seek to the cue point.
+
+
+[ChannelN]duration
+[PreviewDeckN]duration
+[SamplerN]duration
+Outputs the length of the current song in seconds
+
+[ChannelN]pitch
+[PreviewDeckN]pitch
+[SamplerN]pitch
+The total adjustment to the track’s pitch, including changes from the rate slider if keylock is off as well as pitch_adjust.
+
+Note : Do not map this to knobs or sliders on controllers; map pitch_adjust instead.
+This is a ControlPotMeter control.
+Range : -6.0..6.0 semitones
+Feedback : Key display
+
+
+
+[ChannelN]pitch_up
+[PreviewDeckN]pitch_up
+[SamplerN]pitch_up
+Changes the track pitch up one half step, independent of the tempo.
+Range : binary
+Feedback : Key display
+
+
+[ChannelN]pitch_down
+[PreviewDeckN]pitch_down
+[SamplerN]pitch_down
+Changes the track pitch down one half step, independent of the tempo.
+Range : binary
+Feedback : Key display
+
+
+[ChannelN]pitch_adjust
+[PreviewDeckN]pitch_adjust
+[SamplerN]pitch_adjust
+Adjusts the pitch in addition to the tempo slider pitch and keylock. It is reset after loading a new track.
+This is a ControlPotMeter control.
+Range : -3.0..3.0 semitones
+Feedback : Key display
+
+[ChannelN]key
+[PreviewDeckN]key
+[SamplerN]key
+Current key of the track
+
+Range :
+Value   OpenKey   Lancelot  Traditional
+
+1       1d        8b        C
+2       8d        3b        D♭
+3       3d        10b       D
+4       10d       5b        E♭
+5       5d        12b       E
+6       12d       7b        F
+7       7d        2b        F♯/G♭
+8       2d        9b        G
+9       9d        4b        A♭
+10      4d        11b       A
+11      11d       6b        B♭
+12      6d        1b        B
+13      10m       5a        Cm
+14      5m        12a       C♯m
+15      12m       7a        Dm
+16      7m        2a        D♯m/E♭m
+17      2m        9a        Em
+18      9m        4a        Fm
+19      4m        11a       F♯m
+20      11m       6a        Gm
+21      6m        1a        G♯m
+22      1m        8a        Am
+23      8m        3a        B♭m
+24      3m        10a       Bm
+
+
+New in version 2.0.0.
+
+[ChannelN]keylock
+[PreviewDeckN]keylock
+[SamplerN]keylock
+Enable key-lock for the specified deck (rate changes only affect tempo, not key)
+
+Range : binary
+
+Feedback : key-lock button activates
+
+New in version 1.9.0.
+
+[ChannelN]orientation
+[PreviewDeckN]orientation
+[SamplerN]orientation
+Set channel orientation for the crossfader.
+
+Range
+:
+Value
+
+Meaning
+
+0
+
+Left side of crossfader
+
+1
+
+Center (not affected by crossfader)
+
+2
+
+Right side of crossfader
+
+Feedback
+:
+None
+
+New in version 1.9.0.
+
+[ChannelN]orientation_center
+[PreviewDeckN]orientation_center
+[SamplerN]orientation_center
+[AuxiliaryN]orientation_center
+Assign channel to the center of the crossfader.
+
+[ChannelN]orientation_left
+[PreviewDeckN]orientation_left
+[SamplerN]orientation_left
+[AuxiliaryN]orientation_left
+Assign channel to the left side of the crossfader.
+
+[ChannelN]orientation_right
+[PreviewDeckN]orientation_right
+[SamplerN]orientation_right
+[AuxiliaryN]orientation_right
+Assign channel to the right side of the crossfader.
+
+New in version 2.3.0.
+
+[ChannelN]reverse
+[PreviewDeckN]reverse
+[SamplerN]reverse
+Toggles playing the track backwards
+
+Range : binary
+
+Feedback : REV button
+
+[ChannelN]reverseroll
+[PreviewDeckN]reverseroll
+[SamplerN]reverseroll
+Enables reverse and slip mode while held (Censor)
+
+Range : binary
+
+Feedback : REV button
+
+New in version 2.0.0.

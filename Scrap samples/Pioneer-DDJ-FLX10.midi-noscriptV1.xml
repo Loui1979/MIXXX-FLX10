@@ -1,0 +1,339 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<MixxxControllerPreset mixxxVersion="2.6.0+" schemaVersion="1">
+    <controller id="DDJ-FLX10">
+        <info>
+            <name>Pioneer DDJ-FLX10 (Standard 2-Deck - Verified)</name>
+            <author>Gemini (Verified vs. Spreadsheet)</author>
+            <description>A 'no-script' mapping for 2-deck mixing. All controls are verified against the user-provided MIDI spreadsheet.</description>
+        </info>
+        <scriptfiles>
+            </scriptfiles>
+        <controls>
+            <control>
+                <group>[Channel1]</group>
+                <key>play</key>
+                <description>PLAY/PAUSE</description>
+                <status>0x90</status>
+                <midino>0x0B</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>cue_default</key>
+                <description>CUE</description>
+                <status>0x90</status>
+                <midino>0x0C</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>volume</key>
+                <description>CHANNEL FADER</description>
+                <status>0xB0</status>
+                <midino>0x12</midino>
+                <options><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>rate</key>
+                <description>TEMPO - MSB</description>
+                <status>0xB0</status>
+                <midino>0x00</midino>
+                <options><fourteen-bit-msb/><invert/><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>rate</key>
+                <description>TEMPO - LSB</description>
+                <status>0xB0</status>
+                <midino>0x20</midino>
+                <options><fourteen-bit-lsb/><invert/><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>filterHigh</key>
+                <description>HI EQ</description>
+                <status>0xB0</status>
+                <midino>0x07</midino>
+                <options><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>filterMid</key>
+                <description>MID EQ</description>
+                <status>0xB0</status>
+                <midino>0x0B</midino>
+                <options><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>filterLow</key>
+                <description>LOW EQ</description>
+                <status>0xB0</status>
+                <midino>0x0F</midino>
+                <options><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel1]]</group>
+                <key>super1</key>
+                <description>COLOR (Filter)</description>
+                <status>0xB0</status>
+                <midino>0x1A</midino>
+                <options><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>pfl</key>
+                <description>CUE (Headphones)</description>
+                <status>0x90</status>
+                <midino>0x54</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>sync_enabled</key>
+                <description>SYNC</description>
+                <status>0x90</status>
+                <midino>0x58</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>play</key>
+                <description>PLAY/PAUSE</description>
+                <status>0x91</status>
+                <midino>0x0B</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>cue_default</key>
+                <description>CUE</description>
+                <status>0x91</status>
+                <midino>0x0C</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>volume</key>
+                <description>CHANNEL FADER</description>
+                <status>0xB1</status>
+                <midino>0x12</midino>
+                <options><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>rate</key>
+                <description>TEMPO - MSB</description>
+                <status>0xB1</status>
+                <midino>0x00</midino>
+                <options><fourteen-bit-msb/><invert/><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>rate</key>
+                <description>TEMPO - LSB</description>
+                <status>0xB1</status>
+                <midino>0x20</midino>
+                <options><fourteen-bit-lsb/><invert/><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>filterHigh</key>
+                <description>HI EQ</description>
+                <status>0xB1</status>
+                <midino>0x07</midino>
+                <options><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>filterMid</key>
+                <description>MID EQ</description>
+                <status>0xB1</status>
+                <midino>0x0B</midino>
+                <options><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>filterLow</key>
+                <description>LOW EQ</description>
+                <status>0xB1</status>
+                <midino>0x0F</midino>
+                <options><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel2]]</group>
+                <key>super1</key>
+                <description>COLOR (Filter)</description>
+                <status>0xB1</status>
+                <midino>0x1A</midino>
+                <options><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>pfl</key>
+                <description>CUE (Headphones)</description>
+                <status>0x91</status>
+                <midino>0x54</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>sync_enabled</key>
+                <description>SYNC</description>
+                <status>0x91</status>
+                <midino>0x58</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>jog</key>
+                <description>JOG (Vinyl Off / Bend)</description>
+                <status>0xB0</status>
+                <midino>0x21</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>touch</key>
+                <description>JOG Touch On/Off</description>
+                <status>0x90</status>
+                <midino>0x36</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>scratch</key>
+                <description>JOG (Vinyl On / Scratch)</description>
+                <status>0xB0</status>
+                <midino>0x22</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>jog</key>
+                <description>JOG (Vinyl Off / Bend)</description>
+                <status>0xB1</status>
+                <midino>0x21</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>touch</key>
+                <description>JOG Touch On/Off</description>
+                <status>0x91</status>
+                <midino>0x36</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>scratch</key>
+                <description>JOG (Vinyl On / Scratch)</description>
+                <status>0xB1</status>
+                <midino>0x22</midino>
+                <options><normal/></options>
+            </control>
+            <control><group>[Channel1]</group><key>hotcue_1_activate</key><status>0x98</status><midino>0x00</midino><options><normal/></options></control>
+            <control><group>[Channel1]</group><key>hotcue_2_activate</key><status>0x98</status><midino>0x01</midino><options><normal/></options></control>
+            <control><group>[Channel1]</group><key>hotcue_3_activate</key><status>0x98</status><midino>0x02</midino><options><normal/></options></control>
+            <control><group>[Channel1]</group><key>hotcue_4_activate</key><status>0x98</status><midino>0x03</midino><options><normal/></options></control>
+            <control><group>[Channel1]</group><key>hotcue_5_activate</key><status>0x98</status><midino>0x04</midino><options><normal/></options></control>
+            <control><group>[Channel1]</group><key>hotcue_6_activate</key><status>0x98</status><midino>0x05</midino><options><normal/></options></control>
+            <control><group>[Channel1]</group><key>hotcue_7_activate</key><status>0x98</status><midino>0x06</midino><options><normal/></options></control>
+            <control><group>[Channel1]</group><key>hotcue_8_activate</key><status>0x98</status><midino>0x07</midino><options><normal/></options></control>
+            
+            <control><group>[Channel2]</group><key>hotcue_1_activate</key><status>0x9A</status><midino>0x00</midino><options><normal/></options></control>
+            <control><group>[Channel2]</group><key>hotcue_2_activate</key><status>0x9A</status><midino>0x01</midino><options><normal/></options></control>
+            <control><group>[Channel2]</group><key>hotcue_3_activate</key><status>0x9A</status><midino>0x02</midino><options><normal/></options></control>
+            <control><group>[Channel2]</group><key>hotcue_4_activate</key><status>0x9A</status><midino>0x03</midino><options><normal/></options></control>
+            <control><group>[Channel2]</group><key>hotcue_5_activate</key><status>0x9A</status><midino>0x04</midino><options><normal/></options></control>
+            <control><group>[Channel2]</group><key>hotcue_6_activate</key><status>0x9A</status><midino>0x05</midino><options><normal/></options></control>
+            <control><group>[Channel2]</group><key>hotcue_7_activate</key><status>0x9A</status><midino>0x06</midino><options><normal/></options></control>
+            <control><group>[Channel2]</group><key>hotcue_8_activate</key><status>0x9A</status><midino>0x07</midino><options><normal/></options></control>
+            <control>
+                <group>[Master]</group>
+                <key>crossfader</key>
+                <description>CROSS FADER</description>
+                <status>0xB6</status>
+                <midino>0x1F</midino>
+                <options><soft-takeover/></options>
+            </control>
+            <control>
+                <group>[Library]</group>
+                <key>MoveVertical</key>
+                <description>BROWSE - rotate</description>
+                <status>0xB6</status>
+                <midino>0x40</midino>
+                <options><selectknob/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>LoadSelectedTrack</key>
+                <description>BROWSE - press (load to left deck)</description>
+                <status>0x96</status>
+                <midino>0x46</midino>
+                <options><normal/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>LoadSelectedTrack</key>
+                <description>BROWSE - press (load to right deck)</description>
+                <status>0x96</status>
+                <midino>0x47</midino>
+                <options><normal/></options>
+            </control>
+        </controls>
+        <outputs>
+            <output>
+                <group>[Channel1]</group>
+                <key>play</key>
+                <description>PLAY/PAUSE LED</description>
+                <status>0x90</status>
+                <midino>0x0B</midino>
+                <options><normal/></options>
+            </output>
+            <output>
+                <group>[Channel1]</group>
+                <key>cue_indicator</key>
+                <description>CUE LED</description>
+                <status>0x90</status>
+                <midino>0x0C</midino>
+                <options><normal/></options>
+            </output>
+            <output>
+                <group>[Channel1]</group>
+                <key>pfl</key>
+                <description>HEADPHONE CUE LED</description>
+                <status>0x90</status>
+                <midino>0x54</midino>
+                <options><normal/></options>
+
+            </output>
+            <output>
+                <group>[Channel2]</group>
+                <key>play</key>
+                <description>PLAY/PAUSE LED</description>
+                <status>0x91</status>
+                <midino>0x0B</midino>
+                <options><normal/></options>
+            </output>
+            <output>
+                <group>[Channel2]</group>
+                <key>cue_indicator</key>
+                <description>CUE LED</description>
+                <status>0x91</status>
+                <midino>0x0C</midino>
+                <options><normal/></options>
+            </output>
+            <output>
+                <group>[Channel2]</group>
+                <key>pfl</key>
+                <description>HEADPHONE CUE LED</description>
+                <status>0x91</status>
+                <midino>0x54</midino>
+                <options><normal/></options>
+            </output>
+        </outputs>
+    </controller>
+</MixxxControllerPreset>
