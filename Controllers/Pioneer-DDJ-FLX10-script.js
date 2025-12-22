@@ -106,6 +106,20 @@ DDJFLX10.PIONEER_KEY_MAP = [
 // Tempo ranges
 DDJFLX10.TEMPO_RANGES = [0.06, 0.10, 0.16, 0.25];
 
+// PadFX beat loop roll sizes (in beats) - Page 1 and Page 2
+DDJFLX10.PADFX_SIZES = {
+    // Page 1: Short loops (1/32 to 4 beats)
+    1: [0.03125, 0.0625, 0.125, 0.25, 0.5, 1, 2, 4],
+    // Page 2: Longer loops (1/16 to 32 beats)  
+    2: [0.0625, 0.125, 0.25, 0.5, 1, 2, 4, 8]
+};
+
+// Beat Jump sizes (in beats) - for potential beat jump mode
+DDJFLX10.BEATJUMP_SIZES = {
+    1: [1, 2, 4, 8, 16, 32, 64, 128],
+    2: [0.25, 0.5, 1, 2, 4, 8, 16, 32]
+};
+
 // Pad configuration
 DDJFLX10.PAD_CONFIG = {
     MULTIPLIER: 0x08,
@@ -145,6 +159,7 @@ DDJFLX10.PAD_MODES = {
     PADFX: 'padfx',
     
     // Mode to index mapping (for LED calculations)
+    //  Can be changed
     TO_INDEX: {
         'hotcue': 0,
         'beatloop': 1,
@@ -306,23 +321,17 @@ DDJFLX10.padInputHandler = function(channel, control, value, status) {
     
     // Decode the MIDI message
     const padInfo = DDJFLX10.decodePadMidi(status, control, value);
-    
-    // Only handle press events
-    if (!padInfo.pressed) {
-        if (DDJFLX10.USER_CONFIG.debugPadInput) {
-            DDJFLX10.debug('pad', `Release ignored`);
-        }
-        return;
-    }
-    
     const group = `[Channel${padInfo.deck}]`;
-    
-    // Calculate hotcue number: (page-1)*8 + pad = 1-16
-    const hotcueNum = ((padInfo.page - 1) * 8) + padInfo.pad;
     
     // Handle based on mode
     switch (padInfo.mode) {
         case 'hotcue':
+            // Only handle press events for hotcue
+            if (!padInfo.pressed) return;
+            
+            // Calculate hotcue number: (page-1)*8 + pad = 1-16
+            const hotcueNum = ((padInfo.page - 1) * 8) + padInfo.pad;
+            
             if (padInfo.shifted) {
                 DDJFLX10.pulseControl(group, `hotcue_${hotcueNum}_clear`);
             } else {
@@ -331,14 +340,55 @@ DDJFLX10.padInputHandler = function(channel, control, value, status) {
             break;
             
         case 'padfx':
-            // Pad FX: use effect controls
-            const fxNum = ((padInfo.page - 1) * 8) + padInfo.pad;
-            // TODO: Map to actual effect controls
+            // PadFX: Beat loop rolls (slip loops) - need press AND release
+            const sizes = DDJFLX10.PADFX_SIZES[padInfo.page] || DDJFLX10.PADFX_SIZES[1];
+            const loopSize = sizes[padInfo.pad - 1];
+            
+            if (padInfo.pressed) {
+                // Activate beat loop roll on press
+                engine.setValue(group, `beatlooproll_${loopSize}_activate`, 1);
+            } else {
+                // Deactivate on release - slip back to original position
+                engine.setValue(group, `beatlooproll_${loopSize}_activate`, 0);
+            }
+            break;
+            
+        case 'beatjump':
+            // Only handle press events for beat jump
+            if (!padInfo.pressed) return;
+            
+            const jumpSizes = DDJFLX10.BEATJUMP_SIZES[padInfo.page] || DDJFLX10.BEATJUMP_SIZES[1];
+            const jumpSize = jumpSizes[padInfo.pad - 1];
+            
+            // Pads 1-4: jump backward, Pads 5-8: jump forward
+            if (padInfo.pad <= 4) {
+                engine.setValue(group, 'beatjump_size', jumpSize);
+                DDJFLX10.pulseControl(group, 'beatjump_backward');
+            } else {
+                engine.setValue(group, 'beatjump_size', jumpSizes[padInfo.pad - 5]);
+                DDJFLX10.pulseControl(group, 'beatjump_forward');
+            }
             break;
             
         default:
             console.warn(`[PAD] Unknown mode: ${padInfo.mode}`);
     }
+};
+
+// Cycle through tempo ranges (Shift + Tempo Reset)
+DDJFLX10.cycleTempoRange = function(channel, control, value, status, group) {
+    if (value === 0) return; // ignore release
+    
+    var currRange = engine.getValue(group, "rateRange");
+    var idx = 0;
+    
+    for (var i = 0; i < DDJFLX10.TEMPO_RANGES.length; i++) {
+        if (currRange <= DDJFLX10.TEMPO_RANGES[i]) {
+            idx = (i + 1) % DDJFLX10.TEMPO_RANGES.length;
+            break;
+        }
+    }
+    engine.setValue(group, "rateRange", DDJFLX10.TEMPO_RANGES[idx]);
 };
 
 // Jog touch handler - enables/disables scratching

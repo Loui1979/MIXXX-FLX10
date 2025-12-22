@@ -1,0 +1,665 @@
+FLX10 Manual 
+
+
+
+	On Jog Display (using rekordbox)
+When loading a track from DJ software to a deck, the On Jog Display shows
+various track information.
+If you're using rekordbox, press the [PAGE <] button or [PAGE] button while
+holding the [SHIFT] button to switch information on the On Jog Display
+between Deck Info mode, Waveform mode, Artwork Display, and DJ Logo
+Display.
+
+Deck Info mode
+
+10
+
+11
+
+1
+
+2
+
+3
+
+1
+
+4
+5
+6
+7
+
+112 Flm 128.32
++20.60%
+
+12
+13
+14
+15
+16
+17
+
+0
+
+8
+9
+
+30.00
+
+BEAT SY
+
+18
+
+19
+
+MASTER
+
+1 BPM
+Displays the BPM of the track.
+
+2 Master tempo
+Shows when the master tempo is turned on.
+
+3 Key
+Shows the current key of the track.
+
+4 Key change amount
+Shows the amount of change between the original key and the current key of
+the track.
+
+5 Cue / Loop / Hot Cue points
+Shows the set cue points, loop points, and Hot Cue points as markers.
+
+6 Playback position
+Shows the current playback position.
+
+7 Cue scope
+Shows the cue points, loop points, and Hot Cue points set in the section from
+4 bars before to 16 bars after the current playback position as markers. Also,
+4-bar units based on positions of the set or called-up cue / loop points are
+displayed as markers.
+
+8 Time (minutes, seconds)
+Indicates the remaining time or elapsed time.
+You can change the display via the settings in [Preferences] in rekordbox.
+Read: Changing the settings in rekordbox (page 107)
+. Shows loop beats during loop playback.
+
+9 SYNC
+Lights up when Beat Sync is turned on.
+
+10 Artwork
+Displays the track artwork.
+
+11 Deck number
+Indicates the current playing deck.
+
+12 Track Separation status
+Lights up when Track Separation of the loaded track is complete.
+
+13 Playing speed adjustment range
+Displays the adjustable range based on the original playing speed of the track.
+
+14 Playing speed
+The value changes according to the position of the [TEMPO] slider.
+
+15 On Air
+Indicates the On Air status for the deck you're using.
+Lights up in white when playing deck 1 or deck 2, and lights up in blue when
+playing deck 3 or deck 4.
+
+16 Digital Marker
+Shows the current playback position. Rotates during playback, and stops when
+the deck is paused.
+. Press the [SHIFT] button twice to switch between display and non-display.
+. The default setting is non-display.
+
+17 Waveform
+Displays the waveform.
+You can switch the color and format ([Full Waveform] or [Half Waveform])
+according to the setting in [Preferences] > [View] > [Waveform] in rekordbox.
+For information about settings in rekordbox, read the rekordbox Instruction
+Manual.
+
+18 MASTER
+Lights up when the deck is set as the master.
+
+19 Cue point
+Shows the position of the set or called-up cue point.
+
+17 Enlarged waveform (playing deck)
+Displays the enlarged waveform of the playing deck.
+
+18 Enlarged waveform (deck for mixing)
+Displays the enlarged waveform of the track on the deck for mixing.
+
+19 MASTER
+Lights up when the deck is set as the master.
+
+20 Cue point
+Shows the position of the set or called-up cue point.
+
+
+
+
+	To display Mix Point Link
+When you press the [MIX POINT SELECT <] button, [MIX POINT SELECT ]
+button, or [MIX POINT LINK] button, Mix Point Link information appears.
+Read: Using Mix Point Link (page 102)
+
+DECK
+
+1-10 5#m
+MT
+128.32 +20.00%
+
+2
+
+4
+
+3
+
+-30:00
+
+BEAT SYNC
+
+5
+
+1 Playback position (playing deck)
+Indicates the current playback position of the track on the playing deck.
+
+2 Playback start time
+After setting Mix Point Link, the remaining time to start playback of the next
+track will flash.
+When the time reaches 0:00, this disappears.
+
+3 Playback position (deck for mixing)
+Indicates the current playback position of the track on the deck for mixing.
+
+4 Mix Point Link position
+(When Mix Point Link is set), displays the Mix Point Link position in the center
+of the waveform.
+
+5 Mix Point Link status
+This indicator appears when Mix Point Link is turned on.
+
+6 Digital Marker
+Shows the current playback position. Rotates during playback, and stops when
+the deck is paused.
+. Press the [SHIFT] button twice to switch between display and non-display.
+. The default setting is non-display.
+
+7 MASTER
+Lights up when the deck is set as the master.
+
+To display the pad functions
+When you press and hold down the [PAGE <] button or [PAGE >] button,
+information about the functions assigned to the Performance Pads shows.
+When you release the button, the display returns to the previous screen.
+
+
+
+
+
+	On Jog Display (using Serato DJ Pro)
+When loading a track from DJ software to a deck, the On Jog Display shows
+various track information. If you're using Serato DJ Pro, press the [PAGE <]
+button or [PAGE ] button while holding the [SHIFT] button to switch
+information on the On Jog Display between Virtual Deck mode, Waveform
+mode, Artwork Display, and DJ Logo Display.
+
+Virtual Deck mode
+
+1
+
+DECK
+
+7
+
+8
+
+2
+
+3
+
+120.00
+BPM
+
+-1/64
+
+D
+
+4
+
+4
+
+5
+
+Fsm
++12
+
+2
+
+00-14
+
+E
+53.60
+
+A
+
+HOT CUE
+
+100:50
+
+F
+04:30
+
+01:55.6
+
+BEAT SYNO
+
+01:37
+
+08:07
+
+D
+02:38
+
+3.2%
+
+01:58.7
+01:55.6
+
+BEAT SYNG
+
+9
+
+10
+
+11
+
+12
+13
+14
+15
+
+H
+
+08:17
+
+3
+
+1 Pad mode
+Indicates the current pad mode.
+
+2 Pad function
+Shows the function name, parameter, and color information assigned to the
+pad.
+
+3 Time (minutes, seconds)
+Indicates the remaining time or elapsed time.
+
+42 En
+
+1 BPM
+Displays the BPM of the track.
+
+2 Playing speed
+The value changes according to the position of the [TEMPO] slider.
+
+3 Loop
+Shows the loop beat value. During loop playback, this displays in blue.
+
+4 Elapsed time
+
+5 Remaining time
+
+6 SYNC
+Lights up when Sync is turned on.
+
+7 Deck number
+Indicates the current playing deck.
+
+8 Playing speed adjustment range
+Displays the adjustable range based on the original playing speed of the track.
+
+9 Key lock
+Displays this symbol when Key Lock is turned on.
+
+10 Key
+Shows the current key of the track.
+
+11 Key change amount
+Shows the amount of change between the original key and the current key of
+the track.
+
+12 Selected deck
+Lights up in white when playing deck 1 or deck 2, and lights up in blue when
+playing deck 3 or deck 4.
+
+13 Hot Cue
+Shows the nearest Hot Cue point from the current playback position.
+. You can display the Hot Cue information similar to the virtual deck of Serato
+DJ Pro by setting [Display HOT CUE INDICATOR] in the Setting Utility
+(page 159).
+
+14 Digital Marker
+Shows the current playback position. Rotates during playback, and stops when
+the deck is paused.
+. Press the [SHIFT] button twice to switch between display and non-display.
+. The default setting is non-display.
+
+15 Playback position
+Shows the current playback position. Rotates during playback, and stops when
+the deck is paused.
+
+Waveform mode
+
+1
+
+2
+
+3
+
+4
+
+DECK
+
+-3.2%
+
+O1/64 Fim
+120.06
+
+5
+
+7
+
+01:55,6
+
+BEAT SYNG
+
+8
+g
+10
+11
+
+-12
+
+-13
+
+14
+15
+
+44 En
+
+1 Loop
+Shows the loop beat value. During loop playback, this displays in blue.
+
+2 Playing speed
+The value changes according to the position of the [TEMPO] slider.
+
+3 Selected deck
+Lights up in white when playing deck 1 or deck 2, and lights up in blue when
+playing deck 3 or deck 4.
+
+4 Playback position
+Shows the current playback position.
+
+5 Detailed waveform
+Displays the detailed waveform near the current playback position.
+. To enlarge or shrink the detailed waveform, turn the rotary selector while
+holding the [SHIFT] button.
+
+6 Deck number (deck for mixing)
+Indicates the deck number of the waveform for mixing.
+
+7 SYNC
+Lights up when the Sync function is turned on.
+
+45 En
+
+DJ Logo Display
+
+DECK
+
+3
+
+To display the pad functions
+When you press and hold down the [PAGE <] button or [PAGE ] button,
+information about the functions assigned to the Performance Pads shows.
+When you release the button, the display returns to the previous screen.
+
+1
+
+1
+
+5
+
+2
+
+DJ LÒGO
+
+BEAT SYNC
+
+4
+
+2
+
+E
+
+08:07
+
+1 DJ Logo
+Displays the DJ Logo.
+. You can change the DJ Logo in [DJ LOGO DISPLAY] in the Setting Utility
+(page 159).
+
+2 SYNC
+Lights up when the Sync function is turned on.
+
+3 Deck number
+Indicates the current playing deck.
+
+4 Selected deck
+Lights up in white when playing deck 1 or deck 2, and lights up in blue when
+playing deck 3 or deck 4.
+
+5 Digital Marker
+Shows the current playback position. Rotates during playback, and stops when
+the deck is paused.
+. Press the [SHIFT] button twice to switch between display and non-display.
+· The default setting is non-display.
+
+00:50
+
+F
+04-30
+
+01:55.6
+
+BEAT SYNC
+
+HOT CUE
+
+01.37
+
+02:38
+
+H
+06:17
+
+3
+
+1 Pad mode
+Indicates the current pad mode.
+
+2 Pad function
+Shows the function name, parameter, and color information assigned to the
+pad.
+
+3 Time (minutes, seconds)
+Indicates the remaining time or elapsed time.
+
+48 En
+
+49 En
+
+
+
+
+
+Changing the settings
+*: Default
+Launching Utilities 
+mode	Explanation
+Use Utilities mode to change the settings of the unit.
+If the unit is connected to your PC/Mac while it's running rekordbox,
+you won't be able to use Utilities mode.
+To change the settings when connected to rekordbox, change them on
+the Preferences screen in rekordbox.
+Read: Changing the settings in rekordbox (page 107)
+
+1 Press and hold down the [BACK] button.
+The settings screen appears on the On Jog Display.
+
+2 Turn the rotary selector to select a setting item.
+
+3 Press the rotary selector to confirm the selection.
+The screen for changing the setting appears.
+
+4 Turn the rotary selector to select a setting value.
+
+5 Press the rotary selector to confirm the selection.
+. Press the [BACK] button to cancel the setting.
+
+6 Press the [BACK] button.
+The settings screen for Utilities mode closes.
+
+Utilities mode settings
+
+Setting item
+POWER MANAGEMENTSets the Power Management function
+(page 157).. Setting values: OFF, ON*
+
+
+
+
+DEMO/S.SAVER
+Sets the amount of time until demo mode or
+the screen saver starts.
+. Setting values: DISABLE, DEMO 1min,
+DEMO 5min, 
+DEMO 10min*, S.SAVER
+. 
+S.SAVER: Starts the screen saver if no
+operation is performed for 30 minutes.
+Sets the Talkover mode for the microphone
+(page 158).
+
+
+TALKOVER MODE Setting values: ADVANCED*, NORMAL
+Sets the talkover level for the microphone.
+. Setting values: -6dB, -12dB, -18dB*, -
+24dB
+
+TALKOVER LEVEL
+
+
+PHONES OUT Sets the output method for the [PHONES]
+output terminal.Setting values: STEREO*, MONO SPLIT
+SPLIT CUE OUTPUT
+Sets the L/R outputs of sound from the
+[PHONES] output terminal when [MONO
+SPLIT] is selected on the [PHONES OUT]
+setting.
+
+
+MIC TO BOOTH
+Setting values: NORMAL*, INVERT
+Determines whether or not to output the
+microphone sound from the [BOOTH]
+output terminals.
+. Setting values: OFF, ON*
+
+
+
+Setting itemExplanation
+MIC LMT (MSTR)
+Sets whether or not to use the limiter for the
+microphone sound input to the master
+output sound.
+. Setting values: OFF, ON*
+
+MIC LMT (BOOTH)
+Sets whether or not to use the limiter for the
+microphone sound input to sound to the
+[BOOTH] output terminals.
+. Setting values: OFF, ON*
+
+MASTER ATT.
+Sets the attenuation level of the sound from
+the [MASTER 1] and [MASTER 2] output
+terminals.
+
+MASTER OUT
+. Setting values: 0dB*, -6dB, -12dB
+Sets the output method for the sound from
+the [MASTER 1] and [MASTER 2] output
+terminals.
+
+MASTER LIMITER
+. Setting values: STEREO*, MONO
+Reduces distortion to the sound from the
+[MASTER 1] and [MASTER 2] terminals.
+. Setting values: OFF, ON*
+
+BOOTH ATT.
+Sets the attenuation level of the sound from
+the [BOOTH] output terminals.
+. Setting values: 0dB*, -6dB, -12dB
+
+BOOTH OUT
+Sets the output method for the sound from
+the [BOOTH] output terminals.
+
+JOG RING BRT.
+. Setting values: STEREO*, MONO
+Sets the brightness of the jog ring
+illumination.
+
+JOG DISP. BRT.
+. Setting values: OFF, 1, 2, 3*
+Sets the brightness of the On Jog Display.
+· Setting values: 1, 2, 3, 4, 5*/
+
+
+
+Setting item	Explanation
+
+DISPLAY BRT.
+Sets the brightness of the effects section
+display.
+. Setting values: 1, 2, 3*
+
+CR FDR CUT LAG
+Adjusts the range where no sound is heard
+at both edges of the crossfader (cut lag).
+. Setting values: 0 - 6, 7*, 8 - 52
+
+FACTORY RESET
+Select [RESET] to restore the factory
+settings.
+. Setting values: CANCEL*, RESET
+
+
+
+Power Management
+When [POWER MANAGEMENT] is set to [ON], the unit enters Off
+mode automatically after 20 minutes without being used (no audio
+signal (more than -24 dB) is input to the unit).
+The [QUANTIZE] button on the left deck lights up in Off mode.
+Press the [QUANTIZE] button on the left deck to cancel Off mode.
+. The factory setting is [ON].
+. Set [POWER MANAGEMENT] to [OFF] if you don't need to use the
+Power Management function.
+. Power consumption may increase when this setting is set to [OFF].
