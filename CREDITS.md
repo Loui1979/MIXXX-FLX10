@@ -25,8 +25,19 @@ Screen fixes flow back upstream to him via the fork
 
 ## Lougazi — **Loui1979** (this repo)
 - The MIDI mapping in `Controllers/` (Pioneer DDJ-FLX10 for Mixxx), including the
-  channel-16 MIDI outputs.
+  **channel-16 jog-display MIDI outputs** (CC `0xBF` / Note `0x9F`) — the
+  community discovery of the FLX10's channel-16 display CCs.
 - USB-capture tooling and protocol findings in `tools/` and `captures/`.
+
+Veezuhz credits this work in his own repo:
+- *"Protocol sourced from Loui1979 / community reverse-engineering of the FLX10"*
+  (his mapping scripts)
+- *"Loui1979 — community discovery of channel-16 display CCs"*
+  (`FLX10-SCREEN-PROTOCOL-FINDINGS.md`, Credits)
+
+Genuinely mutual: Veezuhz's handshake + screen work builds on the channel-16
+display CCs from Loui1979, and this repo's HID module builds on Veezuhz's
+reverse-engineering. Open-source at its best.
 
 ## Reference
 - Pioneer / AlphaTheta DDJ-FLX10 MIDI Message List (official) — see
