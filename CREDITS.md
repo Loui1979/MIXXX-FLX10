@@ -35,9 +35,11 @@ Veezuhz credits this work in his own repo:
 - *"Loui1979 — community discovery of channel-16 display CCs"*
   (`FLX10-SCREEN-PROTOCOL-FINDINGS.md`, Credits)
 
-Genuinely mutual, but Veezuhz carried this — his persistence is what kept the
-FLX10 alive on Mixxx. He picked it up and kept it going when this repo stalled
-(the channel-16 display CCs he credits above came from here early on).
+The timeline: this repo carried the mapping through the MIDI layer (including the
+channel-16 display CCs Veezuhz credits above). Veezuhz then dove into the HID /
+jog-screen research — the hard reverse-engineering of the unlock handshake and
+the screens. He's been inactive ~3–4 months, so this repo is now picking his HID
+research back up and carrying it forward. Credit to him for that HID groundwork.
 
 ## Reference
 - Pioneer / AlphaTheta DDJ-FLX10 MIDI Message List (official) — see
