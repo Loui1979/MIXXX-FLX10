@@ -1,0 +1,4 @@
+Screen/HID files from Veezuhz/Mixxx_FLX10_Controller_Mapping (commit c668a0b0).
+https://github.com/Veezuhz/Mixxx_FLX10_Controller_Mapping
+MIDI mapping in ../Controllers/ is Loui1979 — do not replace with Pioneer-DDJ-FLX10-scripts.js.
+flx10_screen_daemon.py may include local Lou-MX patches on top of upstream.
