@@ -39,7 +39,8 @@ sample-rate set, `010b` SET_INTERFACE, `2101/a102` audio clock.
 | 7 | 0x0100 | 0xC027 |
 
 **This matches `HID/flx10_unlock_v2.py`'s `VENDOR_CMDS` list EXACTLY, in order.**
-Chris's unlock script is verified correct against the real rekordbox handshake.
+That unlock script is **Veezuhz's** reverse-engineering (Victor Pineda) — this
+capture independently verifies his handshake is correct against real rekordbox.
 These are the commands that make snd-usb-audio see the FLX10's sample rates and
 PCM substreams. Separately, the SysEx on ep3 (below) drives LEDs/displays/
 performance-mode init — a different layer from the audio unlock.
