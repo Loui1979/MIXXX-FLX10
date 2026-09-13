@@ -1,0 +1,6 @@
+node_modules/
+
+# USB captures — can be hundreds of MB, keep them local
+*.pcapng
+*.pcap
+*.devaddr.txt
