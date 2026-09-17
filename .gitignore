@@ -7,3 +7,4 @@ node_modules/
 HID/.venv-relay/
 __pycache__/
 *.pyc
+/tmp/

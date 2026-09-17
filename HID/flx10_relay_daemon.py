@@ -708,13 +708,15 @@ class Relay:
     def __init__(self, dev):
         self.dev = dev
         self.stop = threading.Event()
-        self.wlock = threading.Lock()          # serialize EP3/EP5 writes
+        self.wlock = threading.Lock()          # serialize MIDI ep3 writes (rtmidi callback)
+        self.sclock = threading.Lock()          # separate: ep5 screen writes (upload/builder)
         self.midi_out = rtmidi.MidiOut(name=VPORT_NAME)   # daemon writes -> Mixxx input
         self.midi_in = rtmidi.MidiIn(name=VPORT_NAME)      # Mixxx writes -> daemon
         self.midi_in.ignore_types(sysex=False, timing=False, active_sense=False)
         self._out_count = 0
         self._ipc_count = 0
         self.load_q = queue.Queue()            # track-load work (heavy upload off the MIDI thread)
+        self._threads = []                     # loop threads, registered by main() for clean join
 
     def open_vport(self):
         self.midi_out.open_virtual_port(VPORT_NAME)
@@ -724,7 +726,11 @@ class Relay:
 
     # ep5 screen write (used by the Section 2/3 builders via send_pkt)
     def _send_screen(self, pkt):
-        with self.wlock:
+        if self.stop.is_set():             # bail during shutdown (no write during USB teardown)
+            return
+        with self.sclock:                      # screen path never blocks MIDI ep3
+            if self.stop.is_set():
+                return
             try:
                 self.dev.write(EP5_OUT, bytes(pkt), timeout=500)
             except usb.core.USBError:
@@ -766,9 +772,12 @@ class Relay:
         bulk fill never stalls MIDI."""
         while not self.stop.is_set():
             try:
-                deck, samples, file_bpm, duration = self.load_q.get(timeout=0.3)
+                item = self.load_q.get(timeout=0.3)
             except queue.Empty:
                 continue
+            if item is None:                  # shutdown sentinel from close()
+                break
+            deck, samples, file_bpm, duration = item
             track_id = find_track_id(samples, file_bpm, duration)
             st = DECKS[deck]
             if track_id is None:
@@ -841,6 +850,17 @@ class Relay:
 
     def close(self):
         self.stop.set()
+        # Unblock the loader queue so loader_loop exits, then join everything
+        # BEFORE we release the USB device (avoids ep5 write during dispose -> segfault).
+        try:
+            self.load_q.put(None)
+        except Exception:
+            pass
+        for t in self._threads:
+            try:
+                t.join(timeout=2.0)
+            except Exception:
+                pass
         try:
             self.midi_in.close_port()
             self.midi_out.close_port()
@@ -883,6 +903,7 @@ def main():
         threading.Thread(target=relay.keepalive_loop, daemon=True),
         threading.Thread(target=relay.loader_loop, daemon=True),
     ]
+    relay._threads = threads                 # so close() can join them
     for t in threads:
         t.start()
 
@@ -902,8 +923,13 @@ def main():
             time.sleep(1)
     except KeyboardInterrupt:
         log("stopping")
+        # Set global stop FIRST so _send_screen + the xx36 upload bail immediately,
+        # then stop + join the screen threads, then tear down USB in close().
+        relay.stop.set()
         ping.stop()
         refresh.stop()
+        ping.join(timeout=2.0)
+        refresh.join(timeout=2.0)
         relay.close()
 
 
