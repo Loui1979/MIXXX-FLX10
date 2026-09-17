@@ -1,0 +1,21 @@
+{
+  "env": {
+    "es2020": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "script"
+  },
+  "globals": {
+    "engine": "readonly",
+    "midi": "readonly",
+    "script": "readonly",
+    "console": "readonly"
+  },
+  "rules": {
+    "no-undef": "error",
+    "no-unused-vars": ["warn", { "args": "none", "varsIgnorePattern": "^_" }],
+    "no-var": "off",
+    "no-redeclare": "warn"
+  }
+}

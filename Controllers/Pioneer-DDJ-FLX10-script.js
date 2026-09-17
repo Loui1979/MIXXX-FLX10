@@ -41,9 +41,11 @@ DDJFLX10.USER_CONFIG = {
     // Display settings
     ledBrightness: 1,
     enableVuMeters: true,
-    enableJogTime: true,
-    enableJogDisplay: true,
+    enableJogTime: false,
+    enableJogDisplay: false,   // HID test: ch16 MIDI Deck Info fuses the LCD
     enableJogRingFlash: true,
+    // Re-enabled: Mixxx → controller MIDI (LEDs/VU) now relay-paired
+    enableMidiOut: true,
     
     // Performance settings
     quickJumpSize: 16, // Beats for quick jump
@@ -52,7 +54,19 @@ DDJFLX10.USER_CONFIG = {
     // Debug settings
     debugPadInput: false,      // Log pad input events
     debugJogDisplay: false,    // Log jog display updates
-    debugMidi: false          // Log all MIDI messages
+    debugMidi: false,          // Log all MIDI messages
+    // Log FLX10_TRACK_LOAD / FLX10_POS / FLX10_BPM for flx10_screen_daemon.py
+    enableHidDaemonIpc: true,
+    // Rekordbox SysEx so jog firmware accepts HID waveforms (not Serato)
+    enableRekordboxSysex: true
+};
+// Mixxx 2.7: midi.sendShortMsg is read-only — do not assign to it.
+// Chris: mute short MIDI-OUT for HID/rekordbox SysEx test; SysEx stays on.
+DDJFLX10._outShort = function(status, data1, data2) {
+    if (DDJFLX10.USER_CONFIG.enableMidiOut === false) {
+        return;
+    }
+    midi.sendShortMsg(status, data1, data2);
 };
 // Jog wheel configuration (per Mixxx manual)
 DDJFLX10.JOG_CONFIG = {
@@ -96,12 +110,13 @@ DDJFLX10.DECKS = {
 // =============================================================================
 // ===== LOOKUP TABLES & ARRAYS =====
 // =============================================================================
-// Key map (Mixxx 0-23 to Pioneer values)
-DDJFLX10.PIONEER_KEY_MAP = [
-    0x01, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F,
-    0x11, 0x13, 0x15, 0x17, 0x02, 0x04, 0x06, 0x08,
-    0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14, 0x16, 0x18
-];
+// Mixxx ChromaticKey 1-24 → Pioneer Sheet 6 Data2 0x01-0x18
+DDJFLX10.PIONEER_KEY_FROM_MIXXX = {
+    1: 0x01,  2: 0x03,  3: 0x05,  4: 0x07,  5: 0x09,  6: 0x0B,
+    7: 0x0D,  8: 0x0F,  9: 0x11, 10: 0x13, 11: 0x15, 12: 0x17,
+    13: 0x08, 14: 0x0A, 15: 0x0C, 16: 0x0E, 17: 0x10, 18: 0x12,
+    19: 0x14, 20: 0x16, 21: 0x18, 22: 0x02, 23: 0x04, 24: 0x06
+};
 
 // Tempo ranges
 DDJFLX10.TEMPO_RANGES = [0.06, 0.10, 0.16, 0.25];
@@ -133,14 +148,23 @@ DDJFLX10.JOG_DISPLAY = {
     TIME_MIN: [0x42, 0x44, 0x46, 0x48],  // Deck 1-4
     TIME_SEC: [0x43, 0x45, 0x47, 0x49],  // Deck 1-4
     
-    // Keylock
-    KEYLOCK: [0x20, 0x21, 0x22, 0x23],   // Deck 1-4 (Note Status 0x9F)
-    
-    // Ring/Visibility
-    RING: [0x50, 0x51, 0x52, 0x53],      // Deck 1-4 Jog Ring/LED
-    VISIBILITY: [0x54, 0x55, 0x56, 0x57], // Deck 1-4 Display Clear/Visibility
-    
-    // Jog display data (Pioneer PDF)
+    // Sheet 6 NOTE 0x9F
+    MASTER: [0x18, 0x19, 0x1A, 0x1B],    // MASTER (Beat Sync)
+    SYNC: [0x1C, 0x1D, 0x1E, 0x1F],      // SYNC (Beat Sync)
+    KEYLOCK: [0x20, 0x21, 0x22, 0x23],   // Master tempo
+    VISIBILITY: [0x5D, 0x5E, 0x5F, 0x60], // Display/hide jog info
+
+    // Sheet 6 CC 0xBF
+    RING: [0x09, 0x0A, 0x0B, 0x0C],      // Jog ring illumination
+    CUE_MSB: [0x1C, 0x1D, 0x1E, 0x1F],
+    CUE_LSB: [0x3C, 0x3D, 0x3E, 0x3F],
+
+    // Sheet 6 deck-channel CC (Bn, not ch16)
+    KEY: 0x49,
+    KEY_CHANGE: 0x4A,
+    KEY_FORMAT: 0x5B,
+
+    // Jog display data (Sheet 6)
     MARKER_MSB: [0x10, 0x11, 0x12, 0x13], // Digital marker
     MARKER_LSB: [0x30, 0x31, 0x32, 0x33],
     BPM_MSB: [0x14, 0x15, 0x16, 0x17],     // BPM
@@ -291,8 +315,8 @@ DDJFLX10._sendMsbLsbCC = function(deckNum, msbControls, lsbControls, value14bit)
                     ', BF ' + lsbControls[index].toString(16).toUpperCase() + ' ' + lsb.toString(16) + 
                     ' (deck=' + deckNum + ', value=' + value14bit + ')');
     }
-    midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_CC, msbControls[index], msb);
-    midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_CC, lsbControls[index], lsb);
+    DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, msbControls[index], msb);
+    DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, lsbControls[index], lsb);
 };
 
 // Send degrees as CC
@@ -520,7 +544,7 @@ DDJFLX10.updatePadLed = function(value, group, control) {
     let colorValue = value ? (DDJFLX10.mapColor ? DDJFLX10.mapColor(rgb) : DDJFLX10.MIDI.LED_ON) : DDJFLX10.MIDI.LED_OFF;
 
     const msg = DDJFLX10.encodePadMidi(deck, localPad, page, colorValue > 0);
-    midi.sendShortMsg(msg.status, msg.data1, colorValue);
+    DDJFLX10._outShort(msg.status, msg.data1, colorValue);
 };
 
 // Update all pad LEDs for a group
@@ -552,7 +576,7 @@ DDJFLX10.setPadMode = function(channel, control, value, status, group, mode) {
 // Send pad LED message
 DDJFLX10.sendPadLed = function(deck, pad, modePageIndex, colorValue) {
     const msg = DDJFLX10.encodePadMidi(deck, pad, modePageIndex, colorValue > 0);
-    midi.sendShortMsg(msg.status, msg.data1, colorValue);
+    DDJFLX10._outShort(msg.status, msg.data1, colorValue);
 };
 
 // Jog marker (digital marker): playposition -> degrees
@@ -581,8 +605,8 @@ DDJFLX10.track_bpm = function (value, group, control) {
     if (DDJFLX10.USER_CONFIG.debugJogDisplay) {
         DDJFLX10.debug('jog', 'BPM: deck=' + deckNum + ' bpm=' + bpm + ' msb=' + msb + ' lsb=' + lsb);
     }
-    midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.BPM_MSB[index], msb);
-    midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.BPM_LSB[index], lsb);
+    DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.BPM_MSB[index], msb);
+    DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.BPM_LSB[index], lsb);
 };
 
 // Update jog playing speed display (-100.0% to +100.0%)
@@ -598,8 +622,8 @@ DDJFLX10.track_playing_speed = function (value, group, control) {
     if (DDJFLX10.USER_CONFIG.debugJogDisplay) {
         DDJFLX10.debug('jog', 'Playing speed: deck=' + deckNum + ' rate=' + rate + ' percent=' + percent + ' msb=' + msb + ' lsb=' + lsb);
     }
-    midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.SPEED_MSB[index], msb);
-    midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.SPEED_LSB[index], lsb);
+    DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.SPEED_MSB[index], msb);
+    DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.SPEED_LSB[index], lsb);
 };
 
 // Update jog time display
@@ -624,8 +648,8 @@ DDJFLX10.updateJogTime = function (value, group, control) {
     var sec = Math.floor(time % 60);
     
     // Send time to jog display (Channel 16 CC)
-    midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.TIME_MIN[index], min);
-    midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.TIME_SEC[index], sec);
+    DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.TIME_MIN[index], min);
+    DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.TIME_SEC[index], sec);
 };
 
 // Update jog duration display
@@ -641,11 +665,77 @@ DDJFLX10.updateJogDuration = function(value, group, control) {
     // Duration is always shown as total time
     var min = Math.floor(duration / 60);
     var sec = Math.floor(duration % 60);
-    
-    // Send duration to jog display (Channel 16 CC)
-    // Note: Check if your controller has separate duration displays
-    // For now, we'll send to unused controls or update based on your controller's spec
-    // This might need adjustment based on your controller's actual MIDI mapping
+};
+
+DDJFLX10._sendJogNote = function(deckNum, data1List, on) {
+    var index = deckNum - 1;
+    if (index < 0 || index >= DDJFLX10.DECKS.COUNT) {
+        return;
+    }
+    DDJFLX10._outShort(
+        DDJFLX10.MIDI.JOG_DISPLAY_NOTE,
+        data1List[index],
+        on ? DDJFLX10.MIDI.LED_ON : DDJFLX10.MIDI.LED_OFF
+    );
+};
+
+// Sheet 6: MASTER (Beat Sync) — Mixxx sync_leader
+DDJFLX10.track_sync_leader = function(value, group, control) {
+    var deckNum = DDJFLX10.deckFromGroup(group);
+    if (deckNum === null) {
+        return;
+    }
+    DDJFLX10._sendJogNote(deckNum, DDJFLX10.JOG_DISPLAY.MASTER, !!value);
+};
+
+// Sheet 6: SYNC (Beat Sync) — Mixxx sync_enabled
+DDJFLX10.track_sync_enabled = function(value, group, control) {
+    var deckNum = DDJFLX10.deckFromGroup(group);
+    if (deckNum === null) {
+        return;
+    }
+    DDJFLX10._sendJogNote(deckNum, DDJFLX10.JOG_DISPLAY.SYNC, !!value);
+};
+
+// Sheet 6: Master tempo — Mixxx keylock
+DDJFLX10.track_keylock = function(value, group, control) {
+    var deckNum = DDJFLX10.deckFromGroup(group);
+    if (deckNum === null) {
+        return;
+    }
+    DDJFLX10._sendJogNote(deckNum, DDJFLX10.JOG_DISPLAY.KEYLOCK, !!value);
+};
+
+// Sheet 6: Key — deck CC Bn / 0x49, Data2 0x00-0x18
+DDJFLX10.track_key = function(value, group, control) {
+    var deckNum = DDJFLX10.deckFromGroup(group);
+    if (deckNum === null) {
+        return;
+    }
+    var mixxxKey = Math.round(engine.getValue(group, 'key'));
+    var pioneerKey = DDJFLX10.PIONEER_KEY_FROM_MIXXX[mixxxKey] || 0x00;
+    DDJFLX10._outShort(DDJFLX10.MIDI.CC + (deckNum - 1), DDJFLX10.JOG_DISPLAY.KEY, pioneerKey);
+};
+
+// Sheet 6: Cue point needle, or hide 7F/7F
+DDJFLX10.track_cue_point = function(value, group, control) {
+    var deckNum = DDJFLX10.deckFromGroup(group);
+    if (deckNum === null) {
+        return;
+    }
+    var cue = engine.getValue(group, 'cue_point');
+    var samples = engine.getValue(group, 'track_samples');
+    if (cue < 0 || !samples) {
+        DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.CUE_MSB[deckNum - 1], 0x7F);
+        DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.CUE_LSB[deckNum - 1], 0x7F);
+        return;
+    }
+    DDJFLX10._sendDegreesCC(
+        deckNum,
+        DDJFLX10.JOG_DISPLAY.CUE_MSB,
+        DDJFLX10.JOG_DISPLAY.CUE_LSB,
+        (cue / samples) * 359
+    );
 };
 
 // =============================================================================
@@ -687,30 +777,30 @@ DDJFLX10._initJogDisplayOutputs = function() {
         let group = '[Channel' + (ch + 1) + ']';
         const deckNum = ch + 1;
 
-        // Ensure jog info is visible
-        midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_NOTE, 0x5D + ch, 0x00);
+        // Ensure jog info is visible (Sheet 6: 9F 5D-60, 0x00 = display)
+        DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_NOTE, DDJFLX10.JOG_DISPLAY.VISIBILITY[ch], 0x00);
 
-        // Connect playposition marker (degrees)
         engine.makeConnection(group, 'playposition', DDJFLX10.track_marker);
-
-        // Connect BPM display
         engine.makeConnection(group, 'bpm', DDJFLX10.track_bpm);
-
-        // Connect playing speed (rate %)
         engine.makeConnection(group, 'rate', DDJFLX10.track_playing_speed);
-
-        // Connect time display
         engine.makeConnection(group, 'playposition', DDJFLX10.updateJogTime);
-        
-        // Connect duration display
         engine.makeConnection(group, 'duration', DDJFLX10.updateJogDuration);
+        engine.makeConnection(group, 'sync_leader', DDJFLX10.track_sync_leader);
+        engine.makeConnection(group, 'sync_enabled', DDJFLX10.track_sync_enabled);
+        engine.makeConnection(group, 'keylock', DDJFLX10.track_keylock);
+        engine.makeConnection(group, 'key', DDJFLX10.track_key);
+        engine.makeConnection(group, 'cue_point', DDJFLX10.track_cue_point);
 
-        // Trigger initial values once
         DDJFLX10.track_marker(null, group, 'playposition');
         DDJFLX10.track_bpm(null, group, 'bpm');
         DDJFLX10.track_playing_speed(null, group, 'rate');
         DDJFLX10.updateJogTime(null, group, 'playposition');
         DDJFLX10.updateJogDuration(null, group, 'duration');
+        DDJFLX10.track_sync_leader(engine.getValue(group, 'sync_leader'), group, 'sync_leader');
+        DDJFLX10.track_sync_enabled(engine.getValue(group, 'sync_enabled'), group, 'sync_enabled');
+        DDJFLX10.track_keylock(engine.getValue(group, 'keylock'), group, 'keylock');
+        DDJFLX10.track_key(engine.getValue(group, 'key'), group, 'key');
+        DDJFLX10.track_cue_point(engine.getValue(group, 'cue_point'), group, 'cue_point');
     }
 };
 
@@ -727,17 +817,190 @@ DDJFLX10._initVuMeterOutputs = function() {
             output: function(value) {
                 let level = Math.round(value * 127);  
                 let status = DDJFLX10.MIDI.CC + (this.channelIndex || ch - 1);  
-                midi.sendShortMsg(status, 0x02, level); 
+                DDJFLX10._outShort(status, 0x02, level); 
             }
         };
         
         // Fix closure issue by storing channel index
         vuOptions.channelIndex = ch - 1;
         
-        // VU meter components don't need to be added to containers
-        // They work with direct engine connections
-        let vuComponent = new components.Component(vuOptions);
-        DDJFLX10.vuMeters[ch] = vuComponent;
+        // Direct engine connection (no Components JS)
+        const channelIndex = vuOptions.channelIndex;
+        DDJFLX10.vuMeters[ch] = engine.makeConnection(
+            vuOptions.group,
+            vuOptions.outKey,
+            function(value) {
+                DDJFLX10._outShort(DDJFLX10.MIDI.CC + channelIndex, 0x02, Math.round(value * 127));
+            }
+        );
+    }
+};
+
+// HID daemon IPC — emits deck state as private SysEx (F0 7D ...) to the relay
+// daemon. No log tailing: the daemon reads it off the MIDI wire. (see _ipc* below)
+DDJFLX10._initHidDaemonIpc = function() {
+    if (!DDJFLX10.USER_CONFIG.enableHidDaemonIpc) {
+        return;
+    }
+    DDJFLX10._lastLoggedDuration = {1: 0, 2: 0, 3: 0, 4: 0};
+    DDJFLX10._lastLoggedPos = {1: -1, 2: -1, 3: -1, 4: -1};
+    DDJFLX10._lastLoggedBpm = {1: 0, 2: 0, 3: 0, 4: 0};
+
+    DDJFLX10._logTrackLoadDeferred = function(deck) {
+        var group = '[Channel' + deck + ']';
+        var dur = engine.getValue(group, 'duration');
+        var samples = engine.getValue(group, 'track_samples');
+        var fbpm = engine.getValue(group, 'file_bpm');
+        if (dur > 0 && samples > 0) {
+            DDJFLX10._ipcTrackLoad(deck, samples, fbpm, dur);
+            var rateRatio = engine.getValue(group, 'rate_ratio');
+            var liveBpm = fbpm * rateRatio;
+            var rounded = Math.round(liveBpm * 10) / 10;
+            DDJFLX10._lastLoggedBpm[deck] = rounded;
+            DDJFLX10._ipcBpm(deck, rounded);
+        }
+    };
+
+    for (var d = 1; d <= DDJFLX10.DECKS.COUNT; d++) {
+        (function(deck) {
+            engine.makeConnection('[Channel' + deck + ']', 'duration', function(value) {
+                if (value > 0 && value !== DDJFLX10._lastLoggedDuration[deck]) {
+                    DDJFLX10._lastLoggedDuration[deck] = value;
+                    engine.beginTimer(300, function() {
+                        DDJFLX10._logTrackLoadDeferred(deck);
+                    }, true);
+                }
+            });
+        })(d);
+    }
+
+    DDJFLX10.hidIpcTimer = engine.beginTimer(100, function() {
+        for (var dd = 1; dd <= DDJFLX10.DECKS.COUNT; dd++) {
+            var grp = '[Channel' + dd + ']';
+            var dur = engine.getValue(grp, 'duration');
+            if (dur <= 0) {
+                continue;
+            }
+            var pos = engine.getValue(grp, 'playposition');
+            var posRounded = Math.round(pos * 10000) / 10000;
+            if (posRounded !== DDJFLX10._lastLoggedPos[dd]) {
+                DDJFLX10._lastLoggedPos[dd] = posRounded;
+                DDJFLX10._ipcPos(dd, pos);
+            }
+            var fbpm = engine.getValue(grp, 'file_bpm');
+            var rateRatio = engine.getValue(grp, 'rate_ratio');
+            var liveBpm = fbpm * rateRatio;
+            var rounded = Math.round(liveBpm * 10) / 10;
+            if (rounded !== DDJFLX10._lastLoggedBpm[dd]) {
+                DDJFLX10._lastLoggedBpm[dd] = rounded;
+                DDJFLX10._ipcBpm(dd, rounded);
+            }
+        }
+    }, false);
+};
+
+// Rekordbox-mode SysEx (Veezuhz capture). Puts jog firmware in waveform mode.
+// Serato handshake does not.
+DDJFLX10._SYSEX_RKBOX_KEEPALIVE = [
+    0xF0, 0x00, 0x40, 0x05, 0x00, 0x00, 0x04, 0x01, 0x00, 0x50, 0x00, 0xF7
+];
+DDJFLX10._SYSEX_ENTER_HID = [
+    0xF0, 0x00, 0x40, 0x05, 0x00, 0x00, 0x04, 0x01, 0x00, 0x03, 0x01, 0xF7
+];
+DDJFLX10._SYSEX_RKBOX_DECK_INIT = {
+    1: [0xF0, 0x00, 0x40, 0x05, 0x00, 0x00, 0x04, 0x01,
+        0x00, 0x11, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0xF7],
+    2: [0xF0, 0x00, 0x40, 0x05, 0x00, 0x00, 0x04, 0x01,
+        0x00, 0x12, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0xF7],
+    3: [0xF0, 0x00, 0x40, 0x05, 0x00, 0x00, 0x04, 0x01,
+        0x00, 0x13, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0xF7],
+    4: [0xF0, 0x00, 0x40, 0x05, 0x00, 0x00, 0x04, 0x01,
+        0x00, 0x14, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0xF7]
+};
+DDJFLX10._SYSEX_GLOBAL_B = [
+    0xF0, 0x00, 0x40, 0x05, 0x00, 0x00, 0x04, 0x01,
+    0x00, 0x0B, 0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF7
+];
+DDJFLX10._SYSEX_RKBOX_GLOBAL_C = [
+    0xF0, 0x00, 0x40, 0x05, 0x00, 0x00, 0x04, 0x01,
+    0x00, 0x00, 0x0C, 0x00, 0x00, 0x02, 0x0E, 0x0E, 0x00, 0x00, 0x00, 0xF7
+];
+DDJFLX10._SYSEX_RKBOX_MODE_CONFIG = [
+    0xF0, 0x00, 0x40, 0x05, 0x00, 0x00, 0x04, 0x01,
+    0x00, 0x00, 0x0A, 0x00, 0x28, 0x00, 0x26, 0x00,
+    0x18, 0x3D, 0x3A, 0x05, 0x64, 0x50, 0x2A, 0x54,
+    0x40, 0x14, 0x1A, 0x04, 0x69, 0x13,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF7
+];
+
+DDJFLX10._sendSysex = function(bytes) {
+    midi.sendSysexMsg(bytes, bytes.length);
+};
+
+// ---- Private IPC SysEx -> flx10_relay_daemon (replaces log-tailing) --------
+// The daemon owns the FLX10 via libusb and sits in the MIDI relay path, so it
+// reads these off the wire. 0x7D = the reserved "private/educational" SysEx ID,
+// so it never collides with real Pioneer commands or the mapping spreadsheet.
+// The daemon CONSUMES F0 7D ... (does not forward it to the controller).
+// Values are 7-bit packed (MIDI data bytes are 0..127), big-endian groups.
+//   type 0x01 track load : deck, samples(4x7), file_bpm*100(3x7), dur_ms(3x7)
+//   type 0x02 position   : deck, pos*1e6(3x7)
+//   type 0x03 bpm        : deck, live_bpm*100(3x7)
+DDJFLX10._IPC_ID = 0x7D;
+DDJFLX10._pack7 = function(value, nbytes) {
+    var out = [];
+    value = Math.round(value);
+    if (value < 0) { value = 0; }
+    for (var i = nbytes - 1; i >= 0; i--) {
+        out.push((Math.floor(value / Math.pow(128, i))) & 0x7F);
+    }
+    return out;
+};
+DDJFLX10._ipcTrackLoad = function(deck, samples, fileBpm, durationSec) {
+    var msg = [0xF0, DDJFLX10._IPC_ID, 0x01, deck & 0x7F]
+        .concat(DDJFLX10._pack7(samples, 4))
+        .concat(DDJFLX10._pack7(fileBpm * 100, 3))
+        .concat(DDJFLX10._pack7(durationSec * 1000, 3));
+    msg.push(0xF7);
+    DDJFLX10._sendSysex(msg);
+};
+DDJFLX10._ipcPos = function(deck, pos) {
+    var msg = [0xF0, DDJFLX10._IPC_ID, 0x02, deck & 0x7F]
+        .concat(DDJFLX10._pack7(pos * 1000000, 3));
+    msg.push(0xF7);
+    DDJFLX10._sendSysex(msg);
+};
+DDJFLX10._ipcBpm = function(deck, bpm) {
+    var msg = [0xF0, DDJFLX10._IPC_ID, 0x03, deck & 0x7F]
+        .concat(DDJFLX10._pack7(bpm * 100, 3));
+    msg.push(0xF7);
+    DDJFLX10._sendSysex(msg);
+};
+
+DDJFLX10._initRekordboxSysex = function() {
+    if (!DDJFLX10.USER_CONFIG.enableRekordboxSysex) {
+        return;
+    }
+    try {
+        DDJFLX10._sendSysex(DDJFLX10._SYSEX_RKBOX_KEEPALIVE);
+        for (var d = 1; d <= 4; d++) {
+            DDJFLX10._sendSysex(DDJFLX10._SYSEX_RKBOX_DECK_INIT[d]);
+        }
+        console.log('FLX10: rekordbox EARLY SysEx sent; LATE in 5s');
+        DDJFLX10.sysexKeepaliveTimer = engine.beginTimer(200, function() {
+            DDJFLX10._sendSysex(DDJFLX10._SYSEX_RKBOX_KEEPALIVE);
+        }, false);
+        engine.beginTimer(5000, function() {
+            DDJFLX10._sendSysex(DDJFLX10._SYSEX_GLOBAL_B);
+            DDJFLX10._sendSysex(DDJFLX10._SYSEX_RKBOX_GLOBAL_C);
+            DDJFLX10._sendSysex(DDJFLX10._SYSEX_RKBOX_MODE_CONFIG);
+            DDJFLX10._sendSysex(DDJFLX10._SYSEX_ENTER_HID);
+            console.log('FLX10: rekordbox LATE SysEx sent (mode-enable)');
+        }, true);
+    } catch (e) {
+        console.log('FLX10: rekordbox SysEx failed: ' + e);
     }
 };
 
@@ -753,8 +1016,8 @@ DDJFLX10.init = function(id, debugging) {
     DDJFLX10.padContainers = [];  
     for (let ch = 1; ch <= DDJFLX10.DECKS.COUNT; ch++) {
         let group = '[Channel' + ch + ']';
-        DDJFLX10.channelContainers[ch] = new components.ComponentContainer({group: group});
-        DDJFLX10.padContainers[ch] = new components.ComponentContainer({group: group});
+        DDJFLX10.channelContainers[ch] = {group: group};
+        DDJFLX10.padContainers[ch] = {group: group};
         DDJFLX10.padModes[group] = DDJFLX10.PAD_MODES.HOTCUE;
     }
     
@@ -779,6 +1042,8 @@ DDJFLX10.init = function(id, debugging) {
     DDJFLX10._initPadOutputs();
     DDJFLX10._initJogDisplayOutputs();
     DDJFLX10._initVuMeterOutputs();
+    DDJFLX10._initHidDaemonIpc();
+    DDJFLX10._initRekordboxSysex();
     
     // Initial LED Update
     for (let ch = 1; ch <= DDJFLX10.DECKS.COUNT; ch++) {
@@ -808,11 +1073,11 @@ DDJFLX10.setJogRing = function(deckNum, mode) {
     }
 
     if (mode === 'on') {
-        midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_NOTE, 0x09 + index, 0x01);
+        DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.RING[index], 0x01);
         return;
     }
     if (mode === 'off') {
-        midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_NOTE, 0x09 + index, 0x00);
+        DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.RING[index], 0x00);
         return;
     }
 
@@ -828,7 +1093,7 @@ DDJFLX10.setJogRing = function(deckNum, mode) {
         DDJFLX10.USER_CONFIG.jogRingFlashIntervalMs,
         function() {
             on = !on;
-            midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_NOTE, 0x09 + index, on ? 0x01 : 0x00);
+            DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.RING[index], on ? 0x01 : 0x00);
         },
         false
     );
@@ -836,6 +1101,14 @@ DDJFLX10.setJogRing = function(deckNum, mode) {
 
 // Shutdown: Turn off all pad LEDs, jog rings, and displays
 DDJFLX10.shutdown = function() {
+    if (DDJFLX10.hidIpcTimer) {
+        engine.stopTimer(DDJFLX10.hidIpcTimer);
+        DDJFLX10.hidIpcTimer = null;
+    }
+    if (DDJFLX10.sysexKeepaliveTimer) {
+        engine.stopTimer(DDJFLX10.sysexKeepaliveTimer);
+        DDJFLX10.sysexKeepaliveTimer = null;
+    }
     // Stop any jog ring flash timers
     for (let ch = 1; ch <= DDJFLX10.DECKS.COUNT; ch++) {
         DDJFLX10._stopJogRingFlash(ch);
@@ -844,15 +1117,15 @@ DDJFLX10.shutdown = function() {
     // Turn off all pad LEDs
     for (let ch = 0; ch < DDJFLX10.DECKS.COUNT; ch++) {
         for (let ctrl = 0x00; ctrl <= 0x7F; ctrl++) {
-            midi.sendShortMsg(DDJFLX10.MIDI.NOTE_ON + ch, ctrl, DDJFLX10.MIDI.LED_OFF);
+            DDJFLX10._outShort(DDJFLX10.MIDI.NOTE_ON + ch, ctrl, DDJFLX10.MIDI.LED_OFF);
         }
     }
     
     // Jog rings/displays off
     for (let ch = 1; ch <= DDJFLX10.DECKS.COUNT; ch++) {
         // Turn off Ring
-        midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.RING[ch - 1], DDJFLX10.MIDI.LED_OFF);
+        DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_CC, DDJFLX10.JOG_DISPLAY.RING[ch - 1], DDJFLX10.MIDI.LED_OFF);
         // Hide/Clear Display
-        midi.sendShortMsg(DDJFLX10.MIDI.JOG_DISPLAY_NOTE, DDJFLX10.JOG_DISPLAY.VISIBILITY[ch - 1], 0x7F);  
+        DDJFLX10._outShort(DDJFLX10.MIDI.JOG_DISPLAY_NOTE, DDJFLX10.JOG_DISPLAY.VISIBILITY[ch - 1], 0x7F);  
     }
 };

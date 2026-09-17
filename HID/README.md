@@ -42,7 +42,13 @@ Lou-MX Mixxx is Flatpak. Controllers dir:
 
 `/home/Lou/.var/app/org.mixxx.Mixxx/.mixxx/controllers/`
 
-Unlock (FLX10 plugged, Mixxx closed):
+Unlock + Mixxx + daemon (one script; sudo prompts):
+
+```bash
+"/home/Lou/Desktop/Hermes Projects/MIXXX-FLX10/HID/start-mixxx-hid.sh"
+```
+
+Unlock only (FLX10 plugged, Mixxx closed):
 
 ```bash
 flatpak kill org.mixxx.Mixxx 2>/dev/null

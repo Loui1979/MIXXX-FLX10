@@ -4,3 +4,6 @@ node_modules/
 *.pcapng
 *.pcap
 *.devaddr.txt
+HID/.venv-relay/
+__pycache__/
+*.pyc

@@ -256,6 +256,24 @@ def zeros():
     return bytearray(128)
 
 
+# Tinywin11 rekordbox usbmon: one INT ep5 OUT, 128 bytes, 8 nonzero.
+# Not Serato xx 30 (that uses deck 0x10/20/30/40 + type 0x30).
+REKORDBOX_EP5_OUT = bytes.fromhex(
+    "30210000200100008010000000000000"
+    "0000000000000018fc00000000000000"
+    + ("00" * 96)
+)
+
+
+def send_rekordbox_ep5_replay(ep):
+    """Replay the captured rekordbox HID OUT once."""
+    pkt = bytearray(128)
+    pkt[: len(REKORDBOX_EP5_OUT)] = REKORDBOX_EP5_OUT
+    print("Replaying rekordbox ep5 OUT (xx 21, deck byte 0x30), 128 bytes")
+    print("  " + pkt[:32].hex())
+    send_pkt(ep, pkt)
+
+
 # ===== Per-deck state =======================================================
 
 class DeckState:
@@ -1156,6 +1174,17 @@ def main():
                     help="Skip the 20Hz xx 36 trickle. Without it the firmware drops the "
                          "waveform after ~1 min, but this is useful for diagnosing whether "
                          "the trickle is corrupting other display fields.")
+    ap.add_argument("--serato-init", action="store_true",
+                    help="Send Serato xx 30/39 + rekordbox HID placeholders at start. "
+                         "Off by default: rekordbox capture had almost no HID OUT; "
+                         "MIDI SysEx from Mixxx is the rekordbox-like path.")
+    ap.add_argument("--replay-ep5", action="store_true",
+                    help="Once after hidraw open, send the exact 128-byte INT ep5 OUT "
+                         "from tinywin11 rekordbox capture (xx 21 on deck byte 0x30). "
+                         "Not Serato xx 30.")
+    ap.add_argument("--replay-only", action="store_true",
+                    help="With --replay-ep5: send that packet and exit (handshake "
+                         "before Mixxx starts).")
     args = ap.parse_args()
     global POS_RATE, PWV5_FPS
     POS_RATE = args.pos_rate
@@ -1177,24 +1206,33 @@ def main():
     # Open the hidraw device (non-exclusive — multi-writer via kernel queue)
     ep_out = open_hidraw()
 
-    # Initial per-deck init packets (Serato-mode baseline)
-    print("Sending xx 30 + xx 39 init to all 4 decks …")
-    for d in (1, 2, 3, 4):
-        send_xx30(ep_out, d)
-        send_xx39(ep_out, d)   # xx39 = HOT CUE display setup (see handle_track_load)
+    if args.replay_ep5:
+        send_rekordbox_ep5_replay(ep_out)
+        if args.replay_only:
+            print(" --replay-only: HID packet sent, exiting before Mixxx")
+            return
 
-    # Rekordbox placeholders — without these, SHIFT+PAGE skips waveform
-    print("Sending rekordbox placeholders (xx 2d/3e/2c/2e) so wave mode is selectable …")
-    for d in (1, 2, 3, 4):
-        send_xx2d(ep_out, d)
-        send_xx3e(ep_out, d)
-        send_xx2c_empty(ep_out, d)
-        send_xx2e_empty(ep_out, d)
-    for m in range(1, 6):
-        send_xx3d_display_mode(ep_out, m)
-        time.sleep(0.05)
-    send_xx3d_display_mode(ep_out, 1)
-    print("xx 3d display-mode sweep 1..5, left on 1 (wave)")
+    if args.serato_init:
+        # Initial per-deck init packets (Serato-mode baseline)
+        print("Sending xx 30 + xx 39 init to all 4 decks …")
+        for d in (1, 2, 3, 4):
+            send_xx30(ep_out, d)
+            send_xx39(ep_out, d)   # xx39 = HOT CUE display setup (see handle_track_load)
+
+        # Rekordbox placeholders — without these, SHIFT+PAGE skips waveform
+        print("Sending rekordbox placeholders (xx 2d/3e/2c/2e) so wave mode is selectable …")
+        for d in (1, 2, 3, 4):
+            send_xx2d(ep_out, d)
+            send_xx3e(ep_out, d)
+            send_xx2c_empty(ep_out, d)
+            send_xx2e_empty(ep_out, d)
+        for m in range(1, 6):
+            send_xx3d_display_mode(ep_out, m)
+            time.sleep(0.05)
+        send_xx3d_display_mode(ep_out, 1)
+        print("xx 3d display-mode sweep 1..5, left on 1 (wave)")
+    else:
+        print("Skipping Serato xx 30/39 and HID placeholders (rekordbox MIDI SysEx path)")
 
     # xx 27 is handled ENTIRELY by Mixxx's HID screen.js, with zero position
     # bytes [5..7] (so firmware uses [9..12] for accurate time). Wave shape
@@ -1208,12 +1246,12 @@ def main():
     # Start xx 36 trickle (20 Hz per loaded deck — keeps firmware buffer alive
     # and writes entries at the current playhead position)
     refresher = None
-    if not args.no_trickle:
+    if args.serato_init and not args.no_trickle:
         refresher = RefreshThread(ep_out)
         refresher.start()
         print("xx 36 trickle started (5 Hz per loaded deck, writes entries at current playhead)")
     else:
-        print("xx 36 trickle DISABLED (--no-trickle) — waveform will revert to static after ~1 min")
+        print("xx 36 trickle DISABLED (need --serato-init)")
 
     # Track-load callback — parse Mixxx's analysis file on-the-fly (no cache).
     # Matches the library row using track_samples + file_bpm (both invariant to
@@ -1238,6 +1276,9 @@ def main():
         pwv5, err = waveform_for_track(track_id, duration_sec=duration)
         if err:
             print(f"  deck {deck}: {err}")
+            return
+        if not args.serato_init:
+            print(f"  deck {deck}: skip HID wave upload (no --serato-init)")
             return
         handle_track_load(ep_out, deck, pwv5, label=f"(track_id={track_id})",
                           duration_sec=duration, file_bpm=file_bpm)
