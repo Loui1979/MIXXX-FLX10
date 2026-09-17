@@ -374,6 +374,348 @@
                     <fourteen-bit-msb/>
                 </options>
             </control>
+            <!-- ============================================ -->
+            <!-- === QUICK EFFECTS - COMPLETE MAPPING === -->
+            <!-- ============================================ -->
+            <!-- Quick Effects Enable/Disable Toggles -->
+            <control>
+                <group>[QuickEffectRack1_[Channel1]]</group>
+                <key>enabled</key>
+                <description>QUICK EFFECT ENABLE (DECK1) - toggle</description>
+                <status>0x90</status>
+                <midino>0x18</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel2]]</group>
+                <key>enabled</key>
+                <description>QUICK EFFECT ENABLE (DECK2) - toggle</description>
+                <status>0x91</status>
+                <midino>0x18</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel3]]</group>
+                <key>enabled</key>
+                <description>QUICK EFFECT ENABLE (DECK3) - toggle</description>
+                <status>0x92</status>
+                <midino>0x18</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel4]]</group>
+                <key>enabled</key>
+                <description>QUICK EFFECT ENABLE (DECK4) - toggle</description>
+                <status>0x93</status>
+                <midino>0x18</midino>
+                <options>
+                    <button/>
+                </options>
+            </control>
+            
+            <!-- Quick Effects Parameter 1 (Knob) -->
+            <control>
+                <group>[QuickEffectRack1_[Channel1]]</group>
+                <key>parameter1</key>
+                <description>QUICK EFFECT PARAM1 (DECK1) - knob MSB</description>
+                <status>0xB0</status>
+                <midino>0x11</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel2]]</group>
+                <key>parameter1</key>
+                <description>QUICK EFFECT PARAM1 (DECK2) - knob MSB</description>
+                <status>0xB1</status>
+                <midino>0x11</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel3]]</group>
+                <key>parameter1</key>
+                <description>QUICK EFFECT PARAM1 (DECK3) - knob MSB</description>
+                <status>0xB2</status>
+                <midino>0x11</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel4]]</group>
+                <key>parameter1</key>
+                <description>QUICK EFFECT PARAM1 (DECK4) - knob MSB</description>
+                <status>0xB3</status>
+                <midino>0x11</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            
+            <!-- Quick Effects Parameter 2 (Knob) -->
+            <control>
+                <group>[QuickEffectRack1_[Channel1]]</group>
+                <key>parameter2</key>
+                <description>QUICK EFFECT PARAM2 (DECK1) - knob MSB</description>
+                <status>0xB0</status>
+                <midino>0x12</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel2]]</group>
+                <key>parameter2</key>
+                <description>QUICK EFFECT PARAM2 (DECK2) - knob MSB</description>
+                <status>0xB1</status>
+                <midino>0x12</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel3]]</group>
+                <key>parameter2</key>
+                <description>QUICK EFFECT PARAM2 (DECK3) - knob MSB</description>
+                <status>0xB2</status>
+                <midino>0x12</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel4]]</group>
+                <key>parameter2</key>
+                <description>QUICK EFFECT PARAM2 (DECK4) - knob MSB</description>
+                <status>0xB3</status>
+                <midino>0x12</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            
+            <!-- Quick Effects Mix/Wet-Dry -->
+            <control>
+                <group>[QuickEffectRack1_[Channel1]]</group>
+                <key>mix</key>
+                <description>QUICK EFFECT MIX (DECK1) - wet/dry balance</description>
+                <status>0xB0</status>
+                <midino>0x13</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel2]]</group>
+                <key>mix</key>
+                <description>QUICK EFFECT MIX (DECK2) - wet/dry balance</description>
+                <status>0xB1</status>
+                <midino>0x13</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel3]]</group>
+                <key>mix</key>
+                <description>QUICK EFFECT MIX (DECK3) - wet/dry balance</description>
+                <status>0xB2</status>
+                <midino>0x13</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[QuickEffectRack1_[Channel4]]</group>
+                <key>mix</key>
+                <description>QUICK EFFECT MIX (DECK4) - wet/dry balance</description>
+                <status>0xB3</status>
+                <midino>0x13</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            
+            <!-- ============================================ -->
+            <!-- === STEMS - VOLUME CONTROLS === -->
+            <!-- ============================================ -->
+            <!-- Stems Volume per Channel (if Mixxx 2.6+ supports) -->
+            <control>
+                <group>[Stem1_Channel1]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 1 (DECK1) - fader MSB</description>
+                <status>0xB0</status>
+                <midino>0x18</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem2_Channel1]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 2 (DECK1) - fader MSB</description>
+                <status>0xB0</status>
+                <midino>0x19</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem3_Channel1]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 3 (DECK1) - fader MSB</description>
+                <status>0xB0</status>
+                <midino>0x1A</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem4_Channel1]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 4 (DECK1) - fader MSB</description>
+                <status>0xB0</status>
+                <midino>0x1B</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            
+            <!-- Stems Volume for Deck 2 -->
+            <control>
+                <group>[Stem1_Channel2]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 1 (DECK2) - fader MSB</description>
+                <status>0xB1</status>
+                <midino>0x18</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem2_Channel2]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 2 (DECK2) - fader MSB</description>
+                <status>0xB1</status>
+                <midino>0x19</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem3_Channel2]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 3 (DECK2) - fader MSB</description>
+                <status>0xB1</status>
+                <midino>0x1A</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem4_Channel2]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 4 (DECK2) - fader MSB</description>
+                <status>0xB1</status>
+                <midino>0x1B</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            
+            <!-- Stems Volume for Deck 3 -->
+            <control>
+                <group>[Stem1_Channel3]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 1 (DECK3) - fader MSB</description>
+                <status>0xB2</status>
+                <midino>0x18</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem2_Channel3]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 2 (DECK3) - fader MSB</description>
+                <status>0xB2</status>
+                <midino>0x19</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem3_Channel3]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 3 (DECK3) - fader MSB</description>
+                <status>0xB2</status>
+                <midino>0x1A</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem4_Channel3]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 4 (DECK3) - fader MSB</description>
+                <status>0xB2</status>
+                <midino>0x1B</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            
+            <!-- Stems Volume for Deck 4 -->
+            <control>
+                <group>[Stem1_Channel4]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 1 (DECK4) - fader MSB</description>
+                <status>0xB3</status>
+                <midino>0x18</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem2_Channel4]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 2 (DECK4) - fader MSB</description>
+                <status>0xB3</status>
+                <midino>0x19</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem3_Channel4]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 3 (DECK4) - fader MSB</description>
+                <status>0xB3</status>
+                <midino>0x1A</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            <control>
+                <group>[Stem4_Channel4]</group>
+                <key>volume</key>
+                <description>STEMS VOLUME 4 (DECK4) - fader MSB</description>
+                <status>0xB3</status>
+                <midino>0x1B</midino>
+                <options>
+                    <fourteen-bit-msb/>
+                </options>
+            </control>
+            
             <control>
                 <group>[Channel1]</group>
                 <key>DDJFLX10.jogInputHandler</key>
