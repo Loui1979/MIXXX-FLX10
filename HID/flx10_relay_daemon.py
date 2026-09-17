@@ -30,6 +30,7 @@ import glob
 import json
 import zlib
 import errno
+import queue
 import struct
 import sqlite3
 import threading
@@ -527,6 +528,154 @@ def send_scroll_update(ep, deck, pos_entries, pwv5_bytes):
 # ===== end Veezuhz waveform engine Section 2 ================================
 
 
+# ============================================================================
+# ===== VEEZUHZ WAVEFORM ENGINE — Section 3: deck state + driver threads ======
+# ============================================================================
+# Ported from flx10_screen_daemon.py by Veezuhz. DeckState / interp_pos /
+# StatePingThread / RefreshThread / handle_track_load kept faithful; the
+# threads now take a `send` callable (Relay._send_screen -> ep5 libusb) instead
+# of a hidraw fd. xx27 IS re-enabled here (Veezuhz disabled it because Mixxx's
+# screen.js drove it — we have no screen.js, so the daemon owns xx27 too).
+# ----------------------------------------------------------------------------
+
+class DeckState:
+    def __init__(self):
+        self.bpm         = 0.0
+        self.loaded      = False
+        self.track_id    = None
+        self.duration    = 0.0     # seconds (for position encoding)
+        self.pos         = 0.0     # 0..1 last reported
+        self.last_pos_ts = 0.0
+        self.last_pos_val = 0.0
+        self.prev_pos_val = 0.0
+        self.prev_pos_ts  = 0.0
+        self.pwv5        = b""
+        self.uploading   = False   # gate RefreshThread during bulk fill
+
+DECKS = {1: DeckState(), 2: DeckState(), 3: DeckState(), 4: DeckState()}
+
+
+def interp_pos(st, now=None):
+    """Interpolated playhead between Mixxx's ~100ms position updates. Cautious
+    extrapolation with guards so a burst of updates can't overshoot to 0/1.
+    (Veezuhz — verbatim logic.)"""
+    if now is None:
+        now = time.time()
+    dt = now - st.last_pos_ts
+    if dt < 0.0 or dt > 0.2:
+        return st.last_pos_val
+    if st.prev_pos_ts <= 0:
+        return st.last_pos_val
+    dt_log = st.last_pos_ts - st.prev_pos_ts
+    if dt_log < 0.010 or dt_log > 0.500:
+        return st.last_pos_val
+    rate = (st.last_pos_val - st.prev_pos_val) / dt_log
+    if abs(rate) > 0.5:
+        return st.last_pos_val
+    step_dt = dt if dt < 0.030 else 0.030
+    est = st.last_pos_val + rate * step_dt
+    if est < 0.0: est = 0.0
+    if est > 1.0: est = 1.0
+    return est
+
+
+class StatePingThread(threading.Thread):
+    """xx 27 state ping — playhead / time / BPM. 200 Hz for smooth scroll.
+    Only LOADED decks get pings (empty-deck xx27 resets firmware display
+    state). (Veezuhz — send is now Relay._send_screen.)"""
+    def __init__(self, send, interval_s=0.005):
+        super().__init__(daemon=True)
+        self.send = send
+        self.interval = interval_s
+        self._stop = threading.Event()
+
+    def run(self):
+        while not self._stop.is_set():
+            for d in (1, 2, 3, 4):
+                st = DECKS[d]
+                if not st.loaded:
+                    continue
+                send_pkt(self.send,
+                         build_xx27(DECK_BYTES[d], st.loaded, st.bpm,
+                                    interp_pos(st), duration_sec=st.duration))
+            self._stop.wait(self.interval)
+
+    def stop(self):
+        self._stop.set()
+
+
+class RefreshThread(threading.Thread):
+    """xx 36 trickle at the current playhead, deduped (skip when the entry
+    hasn't advanced). Keeps the firmware wave buffer alive + tracks the
+    playhead. 8 Hz matches Serato's measured cadence. (Veezuhz)"""
+    def __init__(self, send, interval_s=0.125):
+        super().__init__(daemon=True)
+        self.send = send
+        self.interval = interval_s
+        self._last_entry = {1: -1, 2: -1, 3: -1, 4: -1}
+        self._stop = threading.Event()
+
+    def run(self):
+        ENTRIES_PER_PKT = 19
+        while not self._stop.is_set():
+            for d in (1, 2, 3, 4):
+                st = DECKS[d]
+                if not (st.loaded and st.pwv5 and st.duration > 0):
+                    continue
+                if st.uploading:
+                    continue
+                n_entries = len(st.pwv5) // 2
+                entry = int(interp_pos(st) * n_entries)
+                if entry < 0:
+                    entry = 0
+                if entry > n_entries - ENTRIES_PER_PKT:
+                    entry = max(0, n_entries - ENTRIES_PER_PKT)
+                if entry == self._last_entry[d]:
+                    continue
+                self._last_entry[d] = entry
+                send_pkt(self.send, _xx36_packet(DECK_BYTES[d], entry, st.pwv5))
+            self._stop.wait(self.interval)
+
+    def stop(self):
+        self._stop.set()
+
+
+def handle_track_load(send, deck, pwv5, label="", duration_sec=0.0, file_bpm=0.0):
+    """Veezuhz upload sequence, trimmed to the ported builders: xx30 (length)
+    + xx35 (entry count) + full xx36 waveform, then park the playhead at the
+    real position. (xx39 hotcue / xx33 art / xx2f beatgrid deferred.)"""
+    if not pwv5:
+        print(f"  deck {deck}: empty waveform, skipping upload")
+        return
+    st = DECKS[deck]
+    st.pwv5 = bytes(pwv5)
+    n_entries = len(st.pwv5) // 2
+    print(f"  deck {deck}: uploading {n_entries} entries {label} dur={duration_sec:.1f}s")
+    st.uploading = True     # gate RefreshThread during bulk fill (flash fix)
+    try:
+        send_xx30(send, deck, duration_sec=duration_sec)
+        send_xx35(send, deck, n_entries=int(round(duration_sec * 150)))
+        upload_xx36_waveform(send, deck, st.pwv5)
+        # Bulk fill leaves the firmware counter at buffer END; re-park at real playhead.
+        park = int(interp_pos(st) * n_entries)
+        if park < 0: park = 0
+        if park > n_entries - 19: park = max(0, n_entries - 19)
+        send_scroll_update(send, deck, park, st.pwv5)
+    finally:
+        st.uploading = False
+    send_xx3d_display_mode(send, 1)   # jog page = waveform
+
+
+def _unpack7(bs):
+    """Reassemble a big-endian 7-bit-packed integer (matches JS _pack7)."""
+    v = 0
+    for b in bs:
+        v = (v << 7) | (b & 0x7F)
+    return v
+
+# ===== end Veezuhz waveform engine Section 3 ================================
+
+
 # ===== USB init =============================================================
 
 def mode_switch(dev):
@@ -564,6 +713,8 @@ class Relay:
         self.midi_in = rtmidi.MidiIn(name=VPORT_NAME)      # Mixxx writes -> daemon
         self.midi_in.ignore_types(sysex=False, timing=False, active_sense=False)
         self._out_count = 0
+        self._ipc_count = 0
+        self.load_q = queue.Queue()            # track-load work (heavy upload off the MIDI thread)
 
     def open_vport(self):
         self.midi_out.open_virtual_port(VPORT_NAME)
@@ -571,9 +722,80 @@ class Relay:
         self.midi_in.set_callback(self.on_mixxx_midi)
         log(f"virtual MIDI port '{VPORT_NAME}' open (in+out) — select it in Mixxx")
 
-    # Mixxx -> controller (ep3)
+    # ep5 screen write (used by the Section 2/3 builders via send_pkt)
+    def _send_screen(self, pkt):
+        with self.wlock:
+            try:
+                self.dev.write(EP5_OUT, bytes(pkt), timeout=500)
+            except usb.core.USBError:
+                pass
+
+    # ---- private IPC from the JS: F0 7D <type> <deck> <payload> F7 ----------
+    # Consumed here (NOT forwarded to the controller). Fast fields update inline;
+    # the heavy track-load waveform upload is queued to the loader thread.
+    def _handle_ipc(self, msg):
+        if len(msg) < 5 or msg[-1] != 0xF7:
+            return
+        typ = msg[2]; deck = msg[3]
+        st = DECKS.get(deck)
+        if st is None:
+            return
+        body = msg[4:-1]
+        if typ == 0x01 and len(body) >= 10:            # track load
+            samples = _unpack7(body[0:4])
+            file_bpm = _unpack7(body[4:7]) / 100.0
+            duration = _unpack7(body[7:10]) / 1000.0
+            self._ipc_count += 1
+            if self._ipc_count <= 8:
+                log(f"  IPC track-load deck={deck} samples={samples} "
+                    f"bpm={file_bpm} dur={duration:.1f}s")
+            self.load_q.put((deck, samples, file_bpm, duration))
+        elif typ == 0x02 and len(body) >= 3:           # position
+            pos = _unpack7(body[0:3]) / 1000000.0
+            st.prev_pos_val = st.last_pos_val
+            st.prev_pos_ts  = st.last_pos_ts
+            st.last_pos_val = pos
+            st.last_pos_ts  = time.time()
+            st.pos = pos
+        elif typ == 0x03 and len(body) >= 3:           # bpm
+            st.bpm = _unpack7(body[0:3]) / 100.0
+
+    def loader_loop(self):
+        """Consumes track-load requests: library lookup -> parse waveform ->
+        upload. Runs off the MIDI callback thread so the ~1900-packet xx36
+        bulk fill never stalls MIDI."""
+        while not self.stop.is_set():
+            try:
+                deck, samples, file_bpm, duration = self.load_q.get(timeout=0.3)
+            except queue.Empty:
+                continue
+            track_id = find_track_id(samples, file_bpm, duration)
+            st = DECKS[deck]
+            if track_id is None:
+                log(f"  [deck {deck}] no library match "
+                    f"(samples={samples} bpm={file_bpm} dur={duration:.1f})")
+                continue
+            if st.track_id == track_id and st.pwv5:
+                continue                                # already loaded
+            st.track_id = track_id
+            st.bpm = file_bpm
+            st.duration = duration
+            st.loaded = True
+            pwv5, err = waveform_for_track(track_id, duration_sec=duration)
+            if err:
+                log(f"  [deck {deck}] waveform: {err}")
+                continue
+            handle_track_load(self._send_screen, deck, pwv5,
+                              label=f"(track_id={track_id})",
+                              duration_sec=duration, file_bpm=file_bpm)
+
+    # Mixxx -> controller (ep3), OR private IPC we consume
     def on_mixxx_midi(self, event, data=None):
         msg, _ = event
+        # Intercept private IPC (F0 7D ...) — do NOT forward to the controller.
+        if len(msg) >= 3 and msg[0] == 0xF0 and msg[1] == 0x7D:
+            self._handle_ipc(msg)
+            return
         self._out_count += 1
         if self._out_count <= 20:
             log(f"  Mixxx->ep3 #{self._out_count}: {bytes(msg).hex()}")
@@ -659,19 +881,29 @@ def main():
         threading.Thread(target=relay.ep2_loop, daemon=True),
         threading.Thread(target=relay.ep4_loop, daemon=True),
         threading.Thread(target=relay.keepalive_loop, daemon=True),
+        threading.Thread(target=relay.loader_loop, daemon=True),
     ]
     for t in threads:
         t.start()
 
+    # Screen driver threads (Section 3): xx27 state ping + xx36 wave trickle.
+    ping = StatePingThread(relay._send_screen)
+    refresh = RefreshThread(relay._send_screen)
+    ping.start()
+    refresh.start()
+
     log("=== RELAY LIVE ===")
     log(">>> screens should be lit. Start Mixxx, pick controller 'DDJ-FLX10' (relay).")
     log(">>> buttons/jogs -> Mixxx via virtual port; Mixxx LEDs/SysEx -> controller.")
+    log(">>> load a track: JS sends F0 7D IPC -> daemon uploads waveform to jog screens.")
     log("Ctrl+C to stop.")
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
         log("stopping")
+        ping.stop()
+        refresh.stop()
         relay.close()
 
 
