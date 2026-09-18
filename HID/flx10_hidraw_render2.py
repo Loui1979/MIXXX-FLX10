@@ -97,6 +97,10 @@ def main():
         sys.exit("no analyzed track")
     tid, dur, bpm, title, pwv5 = picked
     print(f"track {tid} '{title}' dur={dur:.1f}s entries={len(pwv5)//2}")
+    apath = D.analysis_path_for_track(tid)
+    print("analysis blob:", apath)
+    if not apath:
+        print("WARNING: no analysis blob -> will fall back to Serato xx36 (wave won't paint)")
     fd = os.open(node, os.O_RDWR); cnt = {"ok": 0, "err": 0}
     def send(pkt):
         b = bytes(pkt); b = b.ljust(128, b"\x00") if len(b) < 128 else b
@@ -109,24 +113,18 @@ def main():
     st.last_pos_val = 0.0; st.last_pos_ts = time.time()
     st.prev_pos_val = 0.0; st.prev_pos_ts = time.time()
     D.send_xx3d_display_mode(send, 1)
-    D.handle_track_load(send, deck, st.pwv5, label=title, duration_sec=dur, file_bpm=bpm)
+    D.handle_track_load(send, deck, st.pwv5, label=title, duration_sec=dur,
+                        file_bpm=bpm, analysis_path=apath)
     print(f"hidraw waveform: {cnt['ok']} OK, {cnt['err']} err")
 
-    # continuous xx27 (digits) + xx36 scroll (wave) — BOTH, like Veezuhz's two threads
-    n_entries = len(st.pwv5) // 2
-    print(">>> 20s: xx27 + xx36 scroll running. CYCLE TO A WAVE VIEW. Ctrl+C to stop.")
-    t0 = time.time(); last_scroll = 0.0
+    # rekordbox mode: 0x37/0x38 bulk wave already uploaded above; the firmware
+    # self-scrolls it off the xx27 playhead — so drive ONLY xx27 here (no Serato xx36).
+    print(">>> 20s: xx27 playhead running. CYCLE TO A WAVE VIEW. Ctrl+C to stop.")
+    t0 = time.time()
     try:
         while time.time() - t0 < 20:
             pos = ((time.time() - t0) / dur) % 1.0        # slow advancing playhead
             send(D.build_xx27(D.DECK_BYTES[deck], True, bpm, pos, dur))
-            now = time.time()
-            if now - last_scroll >= 0.125:                # 8 Hz wave refresh
-                entry = int(pos * n_entries)
-                if entry > n_entries - 19:
-                    entry = max(0, n_entries - 19)
-                D.send_scroll_update(send, deck, entry, st.pwv5)
-                last_scroll = now
             time.sleep(0.033)
     except KeyboardInterrupt:
         pass

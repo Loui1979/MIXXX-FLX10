@@ -72,6 +72,73 @@ Over hidraw a 0x00 report-ID prefix is required (129-byte write).
    /dev/hidraw (0x00-prefixed 128B writes) for the screen.** `xx27` digits
    already render live via this path.
 
+## DECODED (2026-09-17) — 0x37 + 0x38 payload encoding
+
+Full decode of the two waveform families, verified against
+`rb_jogscreen_full_20260916.pcapng` (deck 1, b0=0x10). Decision method:
+adjacent-column smoothness — stride 3 gives mean delta **4.3**, stride 2/4 give
+**~24**, so the payload is unambiguously **3-byte columns** for BOTH types.
+
+### Shared 6-byte ep5 header (0x37 and 0x38 identical)
+
+| off | bytes | meaning |
+|-----|-------|---------|
+| 0   | `10`  | deck (0x10/20/30/40 = deck 1..4) |
+| 1   | `37`/`38` | packet type |
+| 2:4 | LE16  | **packet sequence**, 1-based |
+| 4:6 | LE16  | **total packet count** of this burst |
+| 6:128 | 122B | payload (ALL 122 bytes are data) |
+
+Verified: 0x37 total field = `1e 00` = 30 = the 30 0x37 packets; 0x38 total
+field = `61 02` = 609 = the 609 0x38 packets. 0x38 seq is a true 16-bit counter
+(lo=byte2 wraps 0-255, hi=byte3 increments: 1..255, 256..511, 512..609).
+(The earlier note that 0x61 was a payload length was wrong — it's the count LSB.)
+
+### Payload = continuous 3-byte column stream
+
+Columns STRADDLE packet boundaries — concatenate every packet's `[6:]` (in seq
+order) to rebuild one flat stream, then slice 3 bytes per column. Each column =
+three frequency-band amplitudes. Band→lane order inferred from temporal stats
+of the capture (no audio ground truth, so this is the one hardware-tunable):
+
+- **lane1 = LOW**  — smoothest (lag-1 Δ 2.35), 1% near-silent, sustained bass
+- **lane2 = MID**  — intermediate (lag-1 Δ 4.27)
+- **lane0 = HIGH** — spiky (lag-1 Δ 6.30), 12% near-silent, biggest transients
+
+So `column = [HIGH, LOW, MID]`. Values ran 0..~0xB0 (Mixxx bands are 0..255).
+If on-screen colours look wrong, permute this triplet (one A/B pass).
+
+### 0x37 = low-res full-track OVERVIEW
+
+30 packets → ~**1186 columns**. Packet #1 payload begins with a 4-byte
+sub-header `80 01 01 00` (constant; replay verbatim), then columns.
+
+### 0x38 = high-res full-track WAVEFORM
+
+609 packets → **24766 columns**. This is a **load-time bulk upload**, NOT a live
+per-frame feed. `24766 cols / ~165 s = 150 cols/s` — the same rate Veezuhz used
+for PWV5. The firmware scrolls locally off the playhead from `0x21`/`xx27`
+(already driven by the daemon's StatePingThread) — we do not stream 0x38 per
+tick; we upload it once per track load.
+
+### Feeding it from Mixxx — `HID/flx10_rb_waveform.py`
+
+Import-safe encoder (stdlib only). `build_screen_upload(deck, analysis_path,
+duration_sec)` → `(overview_pkts, full_pkts)`, each a list of raw 128-byte ep5
+packets. It max-pools Mixxx's `(low,mid,high)` bands (4 vals/visual-frame, the
+same `parse_mixxx_waveform` the daemon uses) into `[HIGH,LOW,MID]` columns at
+`FULL_FPS=150` (0x38) and `/OVERVIEW_DECIM=21` (0x37), then frames them with the
+header above. Offline `--selftest` reproduces the capture byte-for-frame: 609
+0x38 packets / 30 0x37 packets / correct seq+total / the `80 01 01 00`
+sub-header / 24766 reconstructed columns.
+
+**Wired in `flx10_relay_daemon.py` (default ON).** Track-load skips PWV5 and
+calls `build_screen_upload`; long tracks clip at 24500 cols; no Serato `0x3d`
+after the RB upload. Opt out with `RUN_REKORDBOX_WAVE=0`. Tunables:
+`BAND_ORDER`, `BAND_GAIN`, `FULL_FPS`, `OVERVIEW_DECIM`. Paint+scroll still
+UNVERIFIED on hardware — power-cycle first. If the wave sits still, decode
+`0x21` next (not BAND_ORDER).
+
 ## What already works (verified on hardware this session)
 
 - ep0 unlock with all kernel drivers still bound (no detach needed).

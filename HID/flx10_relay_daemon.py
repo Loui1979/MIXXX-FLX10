@@ -37,6 +37,7 @@ import threading
 import usb.core
 import usb.util
 import rtmidi
+import flx10_rb_waveform as rb_waveform
 
 VID = 0x2B73
 PID = 0x0041
@@ -187,9 +188,21 @@ MIXXX_DB       = os.path.join(_MIXXX_DIR, "mixxxdb.sqlite")
 MIXXX_ANALYSIS = os.path.join(_MIXXX_DIR, "analysis")
 
 PWV5_FPS       = 150       # Pioneer PWV5 spec: 75 fps x 2 half-frames.
-FW_WAVE_BUFFER = 24500     # firmware wave buffer in entries (empirical)
+FW_WAVE_BUFFER = 24500     # firmware wave buffer capacity (~163s @150fps).
+                          # NOTE: Serato PWV5 packs 2 bytes/entry here; the
+                          # rekordbox 0x38 path packs 3-byte columns (see
+                          # DECODED 0x37/0x38 below). Different byte layout for
+                          # the same buffer — do NOT feed _convert_to_pwv5
+                          # output to an 0x38 packetiser; downsample from Mixxx
+                          # 4-value frames straight to 3-byte columns.
 
 DECK_BYTES = {1: 0x10, 2: 0x20, 3: 0x30, 4: 0x40}
+
+# Default ON: rekordbox 0x37+0x38 at track-load (the dialect that paints).
+# Opt out with RUN_REKORDBOX_WAVE=0 to fall back to Serato xx36.
+# StatePingThread (xx27) still drives the playhead; RefreshThread is silenced
+# in rekordbox mode (no xx36 trickle — firmware scrolls the 0x38 blob itself).
+RUN_REKORDBOX_WAVE = os.environ.get("RUN_REKORDBOX_WAVE", "1") == "1"
 
 
 # --- Veezuhz: protobuf varint + Mixxx waveform parse ------------------------
@@ -311,8 +324,8 @@ def waveform_for_track(track_id, duration_sec=0.0):
 
 
 def find_track_id(samples, file_bpm, duration, tol_samples=5000, tol_bpm=0.5, tol_dur=2.0):
-    """Return track_locations.id (= analysis file id) whose
-    (samplerate * duration * channels) ~= samples AND file_bpm ~= library bpm.
+    """Return track_locations.id whose (samplerate * duration * channels) ~= samples
+    AND file_bpm ~= library bpm.
     Pitch-invariant: file_bpm and samples never change with the pitch fader. (Veezuhz)"""
     if not os.path.exists(MIXXX_DB):
         return None
@@ -347,6 +360,24 @@ def find_track_id(samples, file_bpm, duration, tol_samples=5000, tol_bpm=0.5, to
     conn.close()
     return row[0] if row else None
 
+
+def analysis_path_for_track(track_id):
+    """File-system path to Mixxx's waveform analysis blob for the given track_id.
+    Re-resolves the same track_analysis.id -> analysis file mapping used by
+    waveform_for_track, but lets the caller read it raw (needed for the rekordbox
+    0x37/0x38 loader, which downsamples directly rather than via PWV5)."""
+    if not os.path.exists(MIXXX_DB):
+        return None
+    conn = sqlite3.connect(MIXXX_DB)
+    cur = conn.execute("SELECT id FROM track_analysis WHERE track_id = ? AND type = 1 LIMIT 1",
+                       (track_id,))
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return None
+    p = os.path.join(MIXXX_ANALYSIS, str(row[0]))
+    return p if os.path.exists(p) else None
+
 # ===== end Veezuhz waveform engine Section 1 ================================
 
 
@@ -362,7 +393,7 @@ def find_track_id(samples, file_bpm, duration, tol_samples=5000, tol_bpm=0.5, to
 # we now pass that send-callable.
 # ----------------------------------------------------------------------------
 
-POS_RATE       = 128.0     # xx27 [5,6,7] BE24 = pos * duration * POS_RATE (Veezuhz)
+POS_RATE       = float(os.environ.get("FLX10_POS_RATE", "128.0"))   # xx27 [5,6,7] BE24 = pos * duration * POS_RATE (Veezuhz --pos-rate; tune platter rotation live)
 SERATO_DECK_31 = {0x10: 0x02, 0x20: 0x01, 0x30: 0x04, 0x40: 0x03}
 
 
@@ -550,15 +581,17 @@ class DeckState:
         self.prev_pos_val = 0.0
         self.prev_pos_ts  = 0.0
         self.pwv5        = b""
+        self.has_wave    = False   # True after a successful 0x37/0x38 or xx36 upload
         self.uploading   = False   # gate RefreshThread during bulk fill
 
 DECKS = {1: DeckState(), 2: DeckState(), 3: DeckState(), 4: DeckState()}
 
 
 def interp_pos(st, now=None):
-    """Interpolated playhead between Mixxx's ~100ms position updates. Cautious
-    extrapolation with guards so a burst of updates can't overshoot to 0/1.
-    (Veezuhz — verbatim logic.)"""
+    """Interpolated playhead between Mixxx position updates. Restored to
+    Veezuhz's cautious guards (2026-05-25/26) — earlier local widening caused
+    overshoot. dt>0.2 -> hold; dt_log in [10ms,500ms]; |rate|<=0.5/s; step
+    capped at 30ms. Holds last value otherwise (no runaway on a sparse feed)."""
     if now is None:
         now = time.time()
     dt = now - st.last_pos_ts
@@ -640,30 +673,65 @@ class RefreshThread(threading.Thread):
         self._stop.set()
 
 
-def handle_track_load(send, deck, pwv5, label="", duration_sec=0.0, file_bpm=0.0):
-    """Veezuhz upload sequence, trimmed to the ported builders: xx30 (length)
-    + xx35 (entry count) + full xx36 waveform, then park the playhead at the
-    real position. (xx39 hotcue / xx33 art / xx2f beatgrid deferred.)"""
+def handle_track_load(send, deck, pwv5, label="", duration_sec=0.0, file_bpm=0.0,
+                   analysis_path=None):
+    """Upload a track's waveform to the jog LCD at load time.
+
+    Two dialects, selected by analysis_path:
+      * rekordbox (0x37 overview + 0x38 full) when analysis_path is given —
+        decoded for the FLX10 Sep 2026 (captures/FINDINGS_rekordbox_jogscreen.md).
+        Firmware scrolls the 0x38 blob itself from the 0x21/xx27 playhead, so no
+        per-tick wave trickle is needed (RefreshThread stays silent in this mode).
+      * Serato (Veezuhz xx30/xx35/xx36 + RefreshThread trickle) — legacy path,
+        kept intact for comparison/recovery.
+
+    `pwv5` is still set on DeckState in either path so the Serato RefreshThread
+    playhead mapping keeps working if the flag is off."""
+    st = DECKS[deck]
+    st.pwv5 = bytes(pwv5) if pwv5 else b""
+    n_entries = len(st.pwv5) // 2
+
+    if analysis_path:
+        # ---- rekordbox 0x37/0x38 bulk upload -------------------------------
+        log(f"  deck {deck}: [rekordbox] uploading overview + waveform "
+            f"{label} dur={duration_sec:.1f}s")
+        st.uploading = True
+        try:
+            overview_pkts, full_pkts = rb_waveform.build_screen_upload(
+                deck, analysis_path, duration_sec)
+            n_cols = rb_waveform.columns_for_duration(duration_sec)
+            for p in overview_pkts:
+                send(bytes(p))
+            for p in full_pkts:
+                send(bytes(p))
+            log(f"  deck {deck}: sent {len(overview_pkts)}x0x37 + "
+                f"{len(full_pkts)}x0x38 ({n_cols} cols)")
+            st.has_wave = True
+        finally:
+            st.uploading = False
+        # Do NOT send Serato xx3d here — capture had no 0x3d. Firmware page
+        # comes from the rekordbox init / SHIFT+PAGE, not this packet.
+        return
+
+    # ---- legacy Serato xx36 path (Veezuhz) --------------------------------
     if not pwv5:
         print(f"  deck {deck}: empty waveform, skipping upload")
         return
-    st = DECKS[deck]
-    st.pwv5 = bytes(pwv5)
-    n_entries = len(st.pwv5) // 2
     print(f"  deck {deck}: uploading {n_entries} entries {label} dur={duration_sec:.1f}s")
-    st.uploading = True     # gate RefreshThread during bulk fill (flash fix)
+    st.uploading = True
     try:
         send_xx30(send, deck, duration_sec=duration_sec)
         send_xx35(send, deck, n_entries=int(round(duration_sec * 150)))
         upload_xx36_waveform(send, deck, st.pwv5)
-        # Bulk fill leaves the firmware counter at buffer END; re-park at real playhead.
         park = int(interp_pos(st) * n_entries)
         if park < 0: park = 0
         if park > n_entries - 19: park = max(0, n_entries - 19)
         send_scroll_update(send, deck, park, st.pwv5)
+        st.has_wave = True
     finally:
         st.uploading = False
-    send_xx3d_display_mode(send, 1)   # jog page = waveform
+    send_xx3d_display_mode(send, 1)
+
 
 
 def _unpack7(bs):
@@ -784,19 +852,30 @@ class Relay:
                 log(f"  [deck {deck}] no library match "
                     f"(samples={samples} bpm={file_bpm} dur={duration:.1f})")
                 continue
-            if st.track_id == track_id and st.pwv5:
+            if st.track_id == track_id and st.has_wave:
                 continue                                # already loaded
             st.track_id = track_id
             st.bpm = file_bpm
             st.duration = duration
             st.loaded = True
+            if RUN_REKORDBOX_WAVE:
+                apath = analysis_path_for_track(track_id)
+                if not apath:
+                    log(f"  [deck {deck}] no analysis blob for track_id={track_id}")
+                    continue
+                handle_track_load(self._send_screen, deck, b"",
+                                  label=f"(track_id={track_id})",
+                                  duration_sec=duration, file_bpm=file_bpm,
+                                  analysis_path=apath)
+                continue
             pwv5, err = waveform_for_track(track_id, duration_sec=duration)
             if err:
                 log(f"  [deck {deck}] waveform: {err}")
                 continue
             handle_track_load(self._send_screen, deck, pwv5,
                               label=f"(track_id={track_id})",
-                              duration_sec=duration, file_bpm=file_bpm)
+                              duration_sec=duration, file_bpm=file_bpm,
+                              analysis_path=None)
 
     # Mixxx -> controller (ep3), OR private IPC we consume
     def on_mixxx_midi(self, event, data=None):
@@ -911,7 +990,13 @@ def main():
     ping = StatePingThread(relay._send_screen)
     refresh = RefreshThread(relay._send_screen)
     ping.start()
-    refresh.start()
+    if RUN_REKORDBOX_WAVE:
+        # In rekordbox mode the firmware scrolls the 0x38 blob itself from the
+        # xx27 playhead; the Serato xx36 RefreshThread trickle is not used.
+        log(">>> RUN_REKORDBOX_WAVE=1: Serato xx36 RefreshThread silenced; "
+            "0x38 bulk upload + xx27 scroll in use.")
+    else:
+        refresh.start()
 
     log("=== RELAY LIVE ===")
     log(">>> screens should be lit. Start Mixxx, pick controller 'DDJ-FLX10' (relay).")
