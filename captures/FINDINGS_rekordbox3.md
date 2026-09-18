@@ -1,6 +1,6 @@
 # DDJ-FLX10 ↔ rekordbox USB Protocol — Capture Findings
 
-> **Decision:** We standardized on **rekordbox** captures (not Serato/Lexicon)
+> **Decision:** I standardized on **rekordbox** captures (not Serato/Lexicon)
 > as the reference source — rekordbox drives the FLX10's displays and LEDs with
 > the richest, most complete feature set, so its traffic exposes the most of the
 > undocumented protocol. All findings here and going forward are from rekordbox.
@@ -89,7 +89,7 @@ same data our HID daemon wants for waveforms. NOT MIDI; it's the vendor HID IN.
 
 ## Conclusions for the Mixxx mapping
 
-1. **MIDI is standard USB-MIDI** on bulk ep2(IN)/ep3(OUT) — matches your
+1. **MIDI is standard USB-MIDI** on bulk ep2(IN)/ep3(OUT) — matches my
    spreadsheet approach; no surprises on button/knob input.
 2. **Unlock/init = a sequence of Pioneer SysEx on ep3**, not a control transfer.
    The candidate init sequence (send in order after connect):
@@ -105,6 +105,7 @@ same data our HID daemon wants for waveforms. NOT MIDI; it's the vendor HID IN.
 4. The ISO audio stream is what bloated the capture to 299 MB and likely
    contributed to rekordbox freezing (host usbmon + VMware passthrough both
    hammering the ISO firehose). For future captures: don't play audio.
+   Or set audio to an internal output, like laptop speakers.
 
 ## Next captures to nail specifics (one isolated action each, no audio playing)
 - Load a track on deck 1 → isolates the jog-display SysEx/HID framebuffer.
